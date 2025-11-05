@@ -3,728 +3,1232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulasi Tes Substansi BCKS 2025</title>
+    <title>Kuis Lengkap Kompetensi CKS</title>
     <!-- Memuat Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Memuat font Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Menggunakan font Inter yang dimuat oleh Tailwind */
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Sembunyikan semua soal secara default */
-        .question-block {
-            display: none;
+        /* Style untuk opsi yang dipilih */
+        .selected-option {
+            background-color: #3b82f6 !important; /* bg-blue-600 */
+            color: white !important;
+            border-color: #3b82f6 !important; /* border-blue-600 */
         }
-        /* Tampilkan soal yang aktif */
-        .question-block.active {
-            display: block;
-        }
-        /* Styling untuk radio button yang dipilih */
-        input[type="radio"]:checked + label {
-            background-color: #dbeafe; /* bg-blue-100 */
-            border-color: #3b82f6; /* border-blue-500 */
-        }
-
-        /* Aturan Cetak PDF */
+        
+        /* CSS untuk mencetak/print */
         @media print {
+            body {
+                background-color: white;
+                font-family: 'Times New Roman', Times, serif;
+                color: #000;
+            }
+            
             /* Sembunyikan semua elemen yang tidak perlu dicetak */
-            header, 
-            #quiz-container, 
-            #partial-results-container, 
-            #final-results-container > h2, 
-            #final-results-container > .grid, 
-            #final-results-container > .bg-gray-100,
-            #final-results-container > div.mt-10 { /* Ini menyembunyikan wrapper tombol Ulangi/Cetak */
+            .no-print {
+                display: none !important;
+            }
+            
+            #quiz-container {
                 display: none;
             }
-
-            /* Pastikan container utama dan container hasil akhir terlihat */
-            body > .container, 
-            #final-results-container {
-                display: block;
+            
+            #result-container {
+                display: block !important;
+                box-shadow: none;
                 width: 100%;
-                margin: 0;
-                padding: 0;
-                box-shadow: none;
-            }
-
-            /* Fokuskan pada Tinjauan Jawaban */
-            #answer-key-container {
-                display: block;
-                margin-top: 0;
-                box-shadow: none;
+                max-width: 100%;
                 border: none;
             }
             
-            #answer-key-list .p-4 {
+            .container {
                 box-shadow: none;
-                border: 1px solid #e5e7eb; /* border-gray-200 */
-                page-break-inside: avoid; /* Hindari pecah halaman di tengah blok soal */
+                border: none;
+                padding: 0;
+            }
+            
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+            
+            .analysis-item {
+                page-break-inside: avoid; /* Jaga agar pertanyaan dan analisisnya tidak terpotong */
+                border: 1px solid #eee;
+                background-color: #f9f9f9;
             }
 
-            /* Aturan cetak untuk analisis rasional */
-            .rational-analysis {
-                display: block;
-                border-top: 1px solid #eee;
-            }
-            .rational-analysis div {
-                background-color: #fafafa !important; /* Gunakan warna netral saat cetak */
-                border: 1px solid #ddd !important;
-                color: #000 !important; /* Pastikan teks hitam */
-            }
-            .rational-analysis strong {
-                color: #000 !important;
+            #score {
+                color: #000 !important; /* Pastikan skor terlihat jelas di print */
             }
 
-            /* Hapus warna teks agar default ke hitam (opsional) */
-            .text-green-700, .text-red-700, .text-gray-500, .text-gray-800 {
-                color: #000;
+            p {
+                font-size: 12pt;
             }
         }
-        /* Akhir Aturan Cetak */
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <!-- Saya perlebar container utama agar muat untuk tinjauan jawaban -->
-    <div class="container max-w-5xl mx-auto p-6 md:p-10">
-        <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-700">Simulasi Tes Substansi BCKS 2025</h1>
-            <p class="text-lg text-gray-600 mt-2">Berdasarkan Model Kompetensi Kepala Sekolah 2023</p>
-        </header>
+    <div class="container max-w-3xl w-full mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
+        
+        <h1 class="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6 no-print">
+            Tes Studi Kasus Lengkap CKS
+        </h1>
+        <p class="text-center text-gray-600 mb-8 no-print">Kompetensi Kepribadian, Sosial, dan Profesional</p>
 
-        <!-- Area Konten Kuis -->
-        <div id="quiz-container" class="bg-white p-6 md:p-8 rounded-xl shadow-2xl transition-all duration-300">
+        <!-- Kontainer Kuis -->
+        <div id="quiz-container">
             
-            <!-- Area Progres -->
-            <div id="progress-area" class="mb-6 text-center">
-                <p id="progress-text" class="text-lg font-semibold text-blue-600">Soal 1 dari 70</p>
+            <!-- Judul Bagian -->
+            <h2 id="section-title" class="text-xl font-bold text-center text-gray-700 mb-4 no-print">
+                <!-- Judul Bagian akan dimuat di sini oleh JS -->
+            </h2>
+            
+            <!-- Header Pertanyaan -->
+            <div class="mb-6">
+                <p class="text-lg font-semibold text-blue-700" id="question-counter">Pertanyaan 1 dari 70</p>
                 <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
                     <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 1.4%"></div>
                 </div>
             </div>
 
-            <!-- Judul Kompetensi -->
-            <div class="mb-6 text-center">
-                <h2 id="component-title" class="text-2xl font-bold text-gray-700">Kompetensi Kepribadian</h2>
+            <!-- Pertanyaan -->
+            <div id="question" class="text-lg sm:text-xl text-gray-900 leading-relaxed mb-6 prose">
+                <!-- Pertanyaan akan dimuat di sini oleh JS -->
             </div>
 
-            <!-- Form Kuis -->
-            <form id="quiz-form">
-                <!-- Soal-soal akan di-generate oleh JavaScript di sini -->
-                <div id="questions-wrapper"></div>
-
-                <!-- Navigasi -->
-                <div id="navigation" class="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
-                    <button type="button" id="prev-btn" class="bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Sebelumnya
-                    </button>
-                    
-                    <!-- Tombol ini untuk soal berikutnya -->
-                    <button type="button" id="next-btn" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-all duration-200">
-                        Selanjutnya
-                    </button>
-
-                    <!-- Tombol ini untuk menyelesaikan per bagian -->
-                    <button type="button" id="finish-part-btn" class="hidden bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition-all duration-200">
-                        Selesai Bagian Ini
-                    </button>
-
-                    <!-- Tombol ini untuk submit seluruh tes di akhir -->
-                    <button type="submit" id="finish-quiz-btn" class="hidden bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition-all duration-200">
-                        Selesaikan Tes
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- Area Hasil Per Bagian -->
-        <div id="partial-results-container" class="hidden bg-white p-6 md:p-10 rounded-xl shadow-2xl mt-10 text-center">
-            <h2 class="text-3xl font-bold text-blue-700 mb-4">Selesai Bagian: <span id="partial-component-name"></span></h2>
-            <p class="text-lg text-gray-600 mb-6">Skor Anda untuk bagian ini:</p>
-            <div class="bg-gray-100 p-6 rounded-lg inline-block">
-                <p class="text-5xl font-bold text-blue-600" id="partial-score">0 / 0</p>
+            <!-- Opsi Jawaban -->
+            <div id="options" class="options-grid grid grid-cols-1 gap-3">
+                <!-- Opsi akan dimuat di sini oleh JS -->
             </div>
-            <br>
-            <button type="button" id="next-part-btn" class="mt-10 bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition-all duration-200 text-lg">
-                Lanjut ke Bagian Berikutnya
-            </button>
+
+            <!-- Tombol Navigasi -->
+            <div class="flex justify-between mt-8 no-print">
+                <button id="prev-btn" class="px-6 py-2 rounded-lg bg-gray-500 text-white font-semibold hover:bg-gray-600 transition-all disabled:bg-gray-300 disabled:cursor-not-allowed">
+                    Sebelumnya
+                </button>
+                <button id="next-btn" class="px-6 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all disabled:bg-gray-300">
+                    Berikutnya
+                </button>
+                <button id="submit-btn" class="hidden px-6 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-all">
+                    Selesai & Lihat Hasil
+                </button>
+            </div>
         </div>
 
-        <!-- Area Hasil Final -->
-        <div id="final-results-container" class="hidden bg-white p-6 md:p-10 rounded-xl shadow-2xl mt-10 text-center">
-            <h2 class="text-3xl font-bold text-green-700 mb-6">Hasil Simulasi Anda</h2>
+        <!-- Kontainer Hasil -->
+        <div id="result-container" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Tes Selesai!</h2>
+            <p class="text-xl text-gray-700 mb-6" id="score-text">
+                Total Skor Anda (berdasarkan bobot jawaban):
+            </p>
+            <div class="text-6xl font-extrabold text-blue-600 mb-2" id="score">
+                <!-- Skor akan dimuat di sini -->
+            </div>
+            <p class="text-lg text-gray-500 mb-8" id="max-score-info">
+                <!-- Info skor maks akan dimuat di sini -->
+            </p>
+            <p class="text-gray-600 mb-6">Ini adalah latihan untuk melihat pola pikir Anda dalam menghadapi situasi. Teruslah berefleksi untuk menjadi pemimpin yang lebih baik.</p>
             
-            <div class="grid md:grid-cols-3 gap-6 mb-8">
-                <!-- Skor Kepribadian -->
-                <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
-                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Kompetensi Kepribadian</h3>
-                    <p class="text-3xl font-bold text-blue-600" id="kepribadian-score">0 / 115</p>
-                    <p class="text-sm text-gray-500">(Total 23 Soal)</p>
-                </div>
-                <!-- Skor Sosial -->
-                <div class="bg-green-50 p-6 rounded-lg border border-green-200">
-                    <h3 class="text-xl font-semibold text-green-800 mb-2">Kompetensi Sosial</h3>
-                    <p class="text-3xl font-bold text-green-600" id="sosial-score">0 / 115</p>
-                    <p class="text-sm text-gray-500">(Total 23 Soal)</p>
-                </div>
-                <!-- Skor Profesional -->
-                <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
-                    <h3 class="text-xl font-semibold text-yellow-800 mb-2">Kompetensi Profesional</h3>
-                    <p class="text-3xl font-bold text-yellow-600" id="profesional-score">0 / 120</p>
-                    <p class="text-sm text-gray-500">(Total 24 Soal)</p>
-                </div>
-            </div>
-
-            <div class="bg-gray-100 p-6 rounded-lg">
-                <h3 class="text-2xl font-semibold text-gray-800">Total Skor</h3>
-                <p class="text-5xl font-bold text-blue-700 mt-2" id="total-score">0 / 350</p>
-            </div>
-
-            <!-- Wrapper untuk tombol-tombol Aksi -->
-            <div class="mt-10 flex flex-col md:flex-row justify-center gap-4">
-                <button type="button" id="final-restart-btn" class="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition-all duration-200 text-lg order-2 md:order-1">
-                    Ulangi Simulasi
+            <!-- Tombol Aksi Hasil -->
+            <div class="flex flex-col sm:flex-row justify-center gap-4 no-print">
+                <button id="restart-btn" class="px-8 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all text-lg">
+                    Ulangi Tes
                 </button>
-                <button type="button" id="print-review-btn" class="bg-indigo-600 text-white py-3 px-8 rounded-lg hover:bg-indigo-700 transition-all duration-200 text-lg order-1 md:order-2">
-                    Cetak Tinjauan (PDF)
+                <button id="print-btn" class="px-8 py-3 rounded-lg bg-gray-700 text-white font-semibold hover:bg-gray-800 transition-all text-lg">
+                    Cetak Hasil (PDF)
                 </button>
             </div>
 
-            <!-- Area Tinjauan Jawaban (Kunci Jawaban) -->
-            <div id="answer-key-container" class="mt-12 text-left">
-                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Tinjauan Jawaban dan Analisis</h3>
-                <div id="answer-key-list" class="space-y-6">
-                    <!-- JavaScript akan mengisi bagian ini -->
-                </div>
+            <!-- Kontainer Analisis Rincian -->
+            <div id="analysis-container" class="mt-12 text-left">
+                <!-- Analisis rincian akan dimuat di sini oleh JS -->
             </div>
         </div>
 
     </div>
 
     <script>
+        // ======================================
+        // == GABUNGAN 70 SOAL ==
+        // ======================================
         const questions = [
-            // === KOMPETENSI KEPRIBADIAN (23 Soal) ===
+            // ======================================
+            // == 23 SOAL KOMPETENSI KEPRIBADIAN ==
+            // ======================================
             {
-                id: "q1",
-                component: "kepribadian",
-                question: "Seorang guru senior melakukan kesalahan fatal dalam menyusun soal ujian, menyebabkan protes dari orang tua. Guru tersebut sangat dihormati dan ini adalah kesalahan pertamanya. Sebagai kepala sekolah, apa yang Anda lakukan?",
+                question: "Saat memeriksa laporan dana BOS, Anda menemukan kelebihan anggaran yang tidak signifikan namun dapat Anda gunakan untuk kepentingan pribadi tanpa ada yang tahu. Apa yang Anda lakukan?",
                 options: [
-                    { text: "Menyalahkan guru tersebut secara terbuka di depan orang tua untuk meredakan amarah mereka.", weight: 1 },
-                    { text: "Menjelaskan kepada orang tua bahwa guru tersebut adalah guru senior yang baik dan ini hanya insiden kecil.", weight: 2 },
-                    { text: "Segera mengadakan ujian ulang dan memberikan sanksi administratif ringan kepada guru.", weight: 3 },
-                    { text: "Meminta guru tersebut untuk meminta maaf langsung kepada orang tua, sementara Anda memfasilitasi pertemuan.", weight: 4 },
-                    { text: "Mengambil tanggung jawab penuh di depan orang tua, meminta maaf atas nama sekolah, dan secara pribadi membina guru tersebut untuk memperbaiki proses.", weight: 5 }
+                    "A. Menggunakan dana tersebut karena nilainya kecil dan tidak akan terdeteksi.",
+                    "B. Melaporkan temuan tersebut kepada bendahara dan memintanya melakukan koreksi pembukuan.",
+                    "C. Mendiamkannya, karena jika dilaporkan akan merepotkan bendahara.",
+                    "D. Mengalihkan kelebihan dana tersebut untuk membeli kopi dan snack di ruang guru.",
+                    "E. Menyimpan dana itu 'untuk jaga-jaga' jika ada kebutuhan mendesak sekolah."
                 ],
-                rational_best: "Alasan (Skor 5): Ini menunjukkan integritas (taking ownership), kepemimpinan yang melindungi tim (tidak menyalahkan), dan fokus pada solusi (perbaikan proses). Ini membangun kepercayaan publik dan internal.",
-                rational_worst: "Alasan (Skor 1): Ini adalah tindakan 'melempar badan' yang merusak moral guru, menunjukkan kurangnya integritas kepemimpinan, dan tidak menyelesaikan masalah akar (kesalahan proses)."
+                weights: { A: 1, B: 5, C: 3, D: 2, E: 4 }, // Integritas
+                rationale: "Rasional: Jawaban ini mengukur integritas. (5) Melaporkan untuk koreksi adalah tindakan paling transparan dan jujur. (4) Menyimpan 'jaga-jaga' masih niat baik tapi prosedurnya salah. (3) Mendiamkan adalah pasif dan tidak akuntabel. (2) Mengalihkan ke snack adalah penyalahgunaan ringan. (1) Menggunakan pribadi adalah pelanggaran integritas berat."
             },
             {
-                id: "q2",
-                component: "kepribadian",
-                question: "Anda mendapatkan data bahwa ada indikasi 'dana titipan' dalam proses PPDB. Padahal Anda baru saja menandatangani pakta integritas. Tindakan Anda adalah...",
+                question: "Seorang guru senior di sekolah Anda secara terbuka mengkritik kebijakan baru yang Anda terapkan dalam rapat guru. Kritikannya cukup tajam dan personal. Bagaimana sikap Anda?",
                 options: [
-                    { text: "Mengabaikannya karena sudah menjadi 'rahasia umum' dan untuk 'menambah' anggaran sekolah.", weight: 1 },
-                    { text: "Meminta panitia untuk lebih berhati-hati agar tidak ketahuan oleh publik atau media.", weight: 2 },
-                    { text: "Membuat surat edaran baru yang melarang dana titipan tanpa mengusut yang sudah terjadi.", weight: 3 },
-                    { text: "Mengumpulkan panitia, mengingatkan kembali pakta integritas, dan menghentikan praktik tersebut untuk sisa proses.", weight: 4 },
-                    { text: "Segera menginvestigasi, menghentikan praktik tersebut, dan mengembalikan dana yang sudah masuk secara transparan.", weight: 5 }
+                    "A. Langsung memotong pembicaraannya dan mengatakan bahwa sikapnya tidak profesional.",
+                    "B. Mendengarkan sampai selesai, lalu memintanya bertemu di ruangan Anda setelah rapat untuk diberi teguran keras.",
+                    "C. Mendengarkan dengan tenang, berterima kasih atas masukannya, dan membuka diskusi singkat jika waktu memungkinkan.",
+                    "D. Mengabaikan kritikannya dan melanjutkan rapat seolah tidak terjadi apa-apa.",
+                    "E. Mendengarkan, tetapi setelah rapat menceritakan kepada guru lain betapa tidak sopannya guru senior tersebut."
                 ],
-                rational_best: "Alasan (Skor 5): Menunjukkan integritas level tertinggi. Tidak hanya menghentikan, tetapi juga proaktif menginvestigasi dan transparan mengembalikan dana, memulihkan kepercayaan.",
-                rational_worst: "Alasan (Skor 1): Ini adalah pelanggaran integritas yang jelas, mengabaikan sumpah/pakta, dan berpotensi melanggar hukum."
+                weights: { A: 1, B: 3, C: 5, D: 4, E: 2 }, // Kematangan Emosi
+                rationale: "Rasional: Jawaban ini mengukur kematangan emosi dan kepemimpinan. (5) Tetap tenang dan membuka diskusi menunjukkan kontrol diri dan sikap terbuka. (4) Mengabaikan menunjukkan kontrol diri tapi tidak menyelesaikan masalah. (3) Menegur keras setelah rapat bisa eskalatif. (2) Bergosip menunjukkan ketidakdewasaan. (1) Memotong pembicaraan adalah reaktif dan tidak profesional."
             },
             {
-                id: "q3",
-                component: "kepribadian",
-                question: "Sekolah Anda gagal total dalam sebuah kompetisi bergengsi tingkat provinsi. Tim guru dan siswa yang sudah bekerja keras merasa sangat kecewa dan saling menyalahkan. Respon pertama Anda adalah...",
+                question: "Program sekolah rintisan Anda (misal, 'Gerakan Literasi Pagi') gagal total di bulan pertama karena minim partisipasi siswa dan guru. Apa langkah pertama Anda?",
                 options: [
-                    { text: "Mencari siapa yang paling bertanggung jawab atas kegagalan strategi dan menegurnya.", weight: 1 },
-                    { text: "Mengatakan pada tim bahwa kompetisi itu tidak penting dan lupakan saja.", weight: 2 },
-                    { text: "Segera membubarkan tim dan menggantinya dengan pembina baru untuk tahun depan.", weight: 3 },
-                    { text: "Memberikan ucapan terima kasih atas kerja keras mereka, dan langsung merencanakan evaluasi.", weight: 4 },
-                    { text: "Mengumpulkan seluruh tim, mengapresiasi proses dan kerja keras mereka, dan memimpin refleksi bersama untuk belajar dari kegagalan.", weight: 5 }
+                    "A. Menghentikan program tersebut karena terbukti tidak efektif.",
+                    "B. Menyalahkan guru dan siswa atas kurangnya komitmen mereka.",
+                    "C. Melakukan evaluasi dan refleksi, mengumpulkan masukan dari guru dan siswa untuk merancang ulang program.",
+                    "D. Memberlakukan sanksi bagi siswa yang tidak berpartisipasi untuk meningkatkan kedisiplinan.",
+                    "E. Melanjutkan program seperti biasa, berharap partisipasi akan meningkat seiring waktu."
                 ],
-                rational_best: "Alasan (Skor 5): Menunjukkan resiliensi dan kepemimpinan (growth mindset). Fokusnya adalah pada manusia (apresiasi) dan pembelajaran (refleksi), bukan pada kegagalan.",
-                rational_worst: "Alasan (Skor 1): Mencari kambing hitam (blame culture) adalah tindakan yang merusak tim, mematikan inisiatif, dan menunjukkan kepemimpinan yang buruk."
+                weights: { A: 2, B: 1, C: 5, D: 3, E: 4 }, // Resiliensi & Refleksi Diri
+                rationale: "Rasional: Jawaban ini mengukur resiliensi dan pola pikir reflektif. (5) Evaluasi dan refleksi adalah inti dari perbaikan berkelanjutan. (4) Melanjutkan tanpa perubahan adalah pasif. (3) Memberi sanksi adalah solusi instan yang tidak mengatasi akar masalah. (2) Menghentikan program adalah sikap mudah menyerah. (1) Menyalahkan orang lain adalah tindakan defensif."
             },
-            // Placeholder Kepribadian (q4 - q23)
-            ...Array.from({ length: 20 }, (_, i) => ({
-                id: `q${i + 4}`,
-                component: "kepribadian",
-                question: `[Soal Kepribadian ${i + 4}] Anda menghadapi dilema etika yang kompleks terkait kebijakan baru dari dinas. Kebijakan itu tampaknya merugikan sebagian siswa miskin. Apa prioritas tindakan Anda?`,
+            {
+                question: "Seorang orang tua murid yang berpengaruh di komite sekolah meminta Anda untuk 'membantu' nilai anaknya agar bisa masuk universitas favorit. Sebagai imbalannya, ia menjanjikan donasi besar untuk sekolah. Apa tindakan Anda?",
                 options: [
-                    { text: "Opsi E (Tidak Tepat / Pasif)", weight: 1 },
-                    { text: "Opsi D (Kurang Bijak)", weight: 2 },
-                    { text: "Opsi C (Standar / Reaktif)", weight: 3 },
-                    { text: "Opsi B (Baik / Proaktif)", weight: 4 },
-                    { text: "Opsi A (Sangat Ideal / Berintegritas & Solutif)", weight: 5 }
+                    "A. Menerima tawarannya karena donasi tersebut sangat dibutuhkan sekolah.",
+                    "B. Menolak secara halus dan menjelaskan bahwa nilai adalah wewenang guru mata pelajaran.",
+                    "C. Menolak dengan tegas dan sopan, serta menjelaskan bahwa integritas akademik sekolah tidak bisa ditawar.",
+                    "D. Meminta guru untuk 'sedikit' mengubah nilai agar orang tua tersebut senang, tapi tidak terlalu drastis.",
+                    "E. Menolak, tetapi tetap menawarkan 'bantuan' lain dalam bentuk surat rekomendasi yang berlebihan."
                 ],
-                rational_best: "Alasan (Skor 5): Jawaban ini (Opsi A) menunjukkan integritas, kepemimpinan, dan fokus pada solusi yang berpihak pada murid.",
-                rational_worst: "Alasan (Skor 1): Jawaban ini (Opsi E) menunjukkan sikap pasif, mengabaikan masalah, atau bahkan melanggar etika."
-            })),
+                weights: { A: 1, B: 4, C: 5, D: 2, E: 3 }, // Integritas
+                rationale: "Rasional: Jawaban ini mengukur integritas. (5) Menolak tegas namun sopan adalah sikap tanpa kompromi. (4) Menjelaskan wewenang guru sudah baik, tapi kurang 'tegas' pada aspek integritas. (3) Surat rekomendasi berlebihan juga bentuk ketidakjujuran. (2) Meminta guru mengubah nilai adalah pelanggaran. (1) Menerima tawaran adalah pelanggaran terberat."
+            },
+            {
+                question: "Dua orang guru Anda terlibat konflik pribadi yang mulai berdampak pada suasana ruang guru dan kolaborasi tim. Anda sudah mendengar desas-desus ini. Apa yang Anda lakukan?",
+                options: [
+                    "A. Membiarkannya, berharap mereka bisa menyelesaikan masalahnya sendiri sebagai orang dewasa.",
+                    "B. Memanggil kedua guru tersebut secara bersamaan dan meminta mereka berdamai di depan Anda.",
+                    "C. Berbicara dengan masing-masing guru secara terpisah terlebih dahulu untuk memahami akar masalah, lalu memfasilitasi mediasi.",
+                    "D. Mengumumkan dalam rapat bahwa konflik pribadi tidak boleh dibawa ke sekolah.",
+                    "E. Meminta salah satu guru yang Anda anggap 'biang masalah' untuk pindah ruang kerja."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 4, E: 1 }, // Kompetensi Sosial & Manajerial
+                rationale: "Rasional: Jawaban ini mengukur kompetensi sosial. (5) Mediasi terpisah adalah cara terbaik memahami akar masalah secara objektif. (4) Mengumumkan di rapat adalah preventif, tapi tidak menyelesaikan konflik yang ada. (3) Memanggil bersamaan bisa membuat salah satu pihak defensif. (2) Membiarkannya bisa membuat masalah memburuk. (1) Menghakimi 'biang masalah' tidak adil."
+            },
+            {
+                question: "Hasil akreditasi sekolah Anda turun dari A menjadi B. Tim guru merasa kecewa dan saling menyalahkan. Sebagai pemimpin, apa yang Anda sampaikan pertama kali dalam rapat evaluasi?",
+                options: [
+                    "A. Mencari siapa yang paling bertanggung jawab atas penurunan ini.",
+                    "B. Mengatakan bahwa hasil ini tidak penting, yang penting proses belajar mengajar.",
+                    "C. Menerima hasil sebagai cerminan bersama, mengajak tim untuk tidak saling menyalahkan, dan fokus pada area perbaikan.",
+                    "D. Meminta maaf kepada seluruh guru karena kegagalan kepemimpinan Anda.",
+                    "E. Langsung membentuk tim baru untuk persiapan akreditasi berikutnya tanpa mengevaluasi yang lama."
+                ],
+                weights: { A: 1, B: 2, C: 5, D: 4, E: 3 }, // Kepemimpinan & Resiliensi
+                rationale: "Rasional: Jawaban ini mengukur kepemimpinan. (5) Menerima sebagai tanggung jawab bersama dan fokus pada perbaikan adalah sikap pemimpin sejati. (4) Meminta maaf (poin D) baik, tapi poin C lebih fokus ke solusi. (3) Membentuk tim baru tanpa evaluasi adalah reaktif. (2) Mengatakan tidak penting meremehkan usaha tim. (1) Saling menyalahkan adalah budaya toksik."
+            },
+            {
+                question: "Anda melihat bahwa perpustakaan sekolah sangat sepi dan koleksi bukunya sudah usang. Namun, tidak ada anggaran khusus untuk ini. Apa inisiatif Anda?",
+                options: [
+                    "A. Menutup perpustakaan untuk sementara waktu karena tidak efisien.",
+                    "B. Menunggu hingga ada alokasi dana BOS yang jelas untuk perpustakaan tahun depan.",
+                    "C. Membuat program 'Donasi Buku' yang melibatkan alumni dan komite, serta menata ulang perpustakaan agar lebih nyaman.",
+                    "D. Mewajibkan semua siswa mengunjungi perpustakaan sekali seminggu dan membuat resume.",
+                    "E. Menggunakan dana pribadi Anda untuk membeli beberapa buku baru."
+                ],
+                weights: { A: 1, B: 3, C: 5, D: 4, E: 2 }, // Inisiatif & Kreativitas
+                rationale: "Rasional: Jawaban ini mengukur inisiatif. (5) Melibatkan ekosistem sekolah (alumni, komite) adalah solusi kreatif dan berkelanjutan. (4) Mewajibkan siswa datang adalah solusi 'top-down' yang mungkin tidak efektif jika bukunya usang. (3) Menunggu adalah pasif. (2) Dana pribadi tidak berkelanjutan. (1) Menutup perpustakaan adalah langkah mundur."
+            },
+            {
+                question: "Seorang siswa kedapatan melakukan perundungan (bullying) serius. Orang tuanya datang ke sekolah dan dengan marah menyangkal perbuatan anaknya serta menyalahkan pihak sekolah. Bagaimana Anda menanggapinya?",
+                options: [
+                    "A. Ikut marah dan berdebat dengan orang tua tersebut untuk membela sekolah.",
+                    "B. Tetap tenang, mendengarkan semua keluhan orang tua, lalu menyajikan data/fakta yang ada dengan obyektif.",
+                    "C. Meminta maaf kepada orang tua tersebut agar masalah cepat selesai.",
+                    "D. Memanggil siswa yang bersangkutan dan memarahinya di depan orang tuanya.",
+                    "E. Mempersilakan orang tua pergi dan menangani masalah siswa secara internal saja."
+                ],
+                weights: { A: 1, B: 5, C: 3, D: 2, E: 4 }, // Kematangan Emosi
+                rationale: "Rasional: Jawaban ini mengukur kematangan emosi. (5) Tetap tenang dan menyajikan fakta adalah sikap profesional. (4) Menangani internal baik, tapi mengabaikan orang tua bisa jadi masalah baru. (3) Meminta maaf tanpa data bisa diartikan sekolah bersalah. (2) Memarahi siswa di depan ortu tidak mendidik. (1) Ikut marah adalah reaktif."
+            },
+            {
+                question: "Anda diminta oleh dinas pendidikan untuk segera mengimplementasikan kurikulum baru di tengah semester berjalan. Banyak guru merasa terbebani dan tidak siap. Apa langkah Anda?",
+                options: [
+                    "A. Menolak instruksi dinas karena kondisi di lapangan tidak memungkinkan.",
+                    "B. Memaksa guru untuk menjalankannya segera sesuai instruksi dinas.",
+                    "C. Mengadakan rapat, memetakan kesiapan guru, dan merancang strategi implementasi bertahap sambil memberikan dukungan pelatihan (IHT).",
+                    "D. Melaporkan kepada dinas bahwa guru-guru Anda tidak kompeten.",
+                    "E. Menjalankannya di atas kertas (laporan) saja, sementara praktik mengajar tetap seperti biasa."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 1, E: 4 }, // Kepemimpinan Pembelajaran & Manajerial
+                rationale: "Rasional: Jawaban ini mengukur kepemimpinan. (5) Memetakan, merencanakan, dan memberi dukungan (IHT) adalah solusi manajerial terbaik. (4) 'Laporan saja' adalah ketidakjujuran. (3) Memaksa tanpa dukungan akan gagal. (2) Menolak instruksi adalah pembangkangan. (1) Melaporkan guru tidak kompeten merusak tim."
+            },
+            {
+                question: "Dalam survei kepuasan guru, terungkap bahwa banyak guru merasa Anda 'terlalu kaku' dan 'kurang apresiatif'. Bagaimana reaksi Anda?",
+                options: [
+                    "A. Mengabaikan hasil survei tersebut karena dianggap subyektif.",
+                    "B. Mencari tahu siapa saja guru yang memberikan penilaian buruk tersebut.",
+                    "C. Menjadikan ini sebagai bahan refleksi diri dan mulai memikirkan cara untuk lebih aktif memberi umpan balik positif.",
+                    "D. Menjelaskan di rapat guru bahwa ketegasan diperlukan untuk disiplin.",
+                    "E. Meminta survei diulang dengan metode yang berbeda."
+                ],
+                weights: { A: 2, B: 1, C: 5, D: 3, E: 4 }, // Refleksi Diri & Pengembangan Diri
+                rationale: "Rasional: Jawaban ini mengukur refleksi diri. (5) Menjadikan masukan sebagai refleksi adalah tanda pemimpin pembelajar. (4) Meminta survei diulang terkesan defensif. (3) Menjelaskan ketegasan juga defensif. (2) Mengabaikan berarti anti-kritik. (1) Mencari 'pelaku' adalah intimidatif."
+            },
+            {
+                question: "Seorang guru yang sangat berprestasi dan menjadi andalan sekolah tiba-tiba mengajukan pindah tugas karena merasa 'tidak ada tantangan baru'. Apa yang Anda lakukan?",
+                options: [
+                    "A. Langsung menyetujui kepindahannya karena itu haknya.",
+                    "B. Menahannya dengan janji kenaikan honor atau jabatan.",
+                    "C. Mengajak diskusi mendalam (stay interview), mencari tahu apa 'tantangan baru' yang ia inginkan, dan melihat kemungkinan untuk memfasilitasinya di sekolah.",
+                    "D. Merasa kecewa dan menganggap guru tersebut tidak loyal.",
+                    "E. Menyetujui, tetapi memintanya mencari pengganti yang sepadan terlebih dahulu."
+                ],
+                weights: { A: 3, B: 2, C: 5, D: 1, E: 4 }, // Pengembangan Orang Lain
+                rationale: "Rasional: Jawaban ini mengukur pengembangan SDM. (5) 'Stay interview' dan mencari tantangan baru adalah cara mempertahankan talenta. (4) Meminta cari pengganti membebani guru. (3) Langsung menyetujui berarti pasif. (2) Janji honor/jabatan tidak mengatasi akar masalah 'tantangan'. (1) Menganggap tidak loyal adalah sikap personal."
+            },
+            {
+                question: "Anda menerima laporan bahwa seorang penjaga sekolah sering meminta 'uang rokok' kepada vendor katering sekolah. Apa tindakan Anda?",
+                options: [
+                    "A. Mengabaikannya karena itu urusan kecil di luar jam sekolah.",
+                    "B. Langsung memecat penjaga sekolah tersebut tanpa investigasi.",
+                    "C. Memanggil penjaga sekolah dan vendor secara terpisah untuk klarifikasi, dan jika terbukti, memberikan pembinaan serta sanksi tegas.",
+                    "D. Meminta vendor untuk tidak memberikan uang lagi, tapi tidak menegur penjaga sekolah.",
+                    "E. Menegur penjaga sekolah dengan keras di depan staf lain agar menjadi contoh."
+                ],
+                weights: { A: 1, B: 2, C: 5, D: 4, E: 3 }, // Integritas & Manajerial
+                rationale: "Rasional: Jawaban ini mengukur integritas. (5) Klarifikasi kedua belah pihak dan memberi sanksi terukur adalah adil dan profesional. (4) Meminta vendor berhenti memberi hanya menyelesaikan setengah masalah. (3) Menegur di depan umum merendahkan martabat. (2) Memecat tanpa investigasi melanggar prosedur. (1) Mengabaikan adalah pembiaran."
+            },
+            {
+                question: "Beban kerja Anda sebagai kepala sekolah sangat tinggi (administrasi, manajerial, supervisi). Anda merasa kewalahan dan kelelahan. Apa yang Anda lakukan?",
+                options: [
+                    "A. Mengeluh kepada pengawas sekolah dan meminta pengurangan tugas.",
+                    "B. Tetap bekerja keras sendirian hingga larut malam setiap hari.",
+                    "C. Mulai mendelegasikan beberapa tugas manajerial kepada wakil kepala sekolah dan koordinator, serta memperbaiki manajemen waktu.",
+                    "D. Sering mengambil cuti sakit untuk beristirahat.",
+                    "E. Mengerjakan hanya tugas-tugas yang Anda sukai."
+                ],
+                weights: { A: 3, B: 4, C: 5, D: 2, E: 1 }, // Etos Kerja & Delegasi
+                rationale: "Rasional: Jawaban ini mengukur etos kerja. (5) Delegasi dan manajemen waktu adalah keterampilan manajerial kunci. (4) Bekerja sendiri (burnout) tidak efektif jangka panjang. (3) Mengeluh ke pengawas kurang solutif. (2) Sering cuti sakit mengganggu operasional. (1) Memilih pekerjaan adalah tidak profesional."
+            },
+            {
+                question: "Sekolah Anda berada di daerah yang rawan konflik sosial. Tiba-tiba terjadi ketegangan di masyarakat sekitar. Bagaimana Anda memastikan keamanan siswa?",
+                options: [
+                    "A. Meliburkan sekolah tanpa batas waktu yang jelas.",
+                    "B. Tetap menjalankan sekolah seperti biasa dan mengabaikan situasi di luar.",
+                    "C. Berkoordinasi dengan aparat keamanan setempat, komite sekolah, dan mengaktifkan prosedur darurat keamanan sekolah.",
+                    "D. Meminta guru-guru untuk menjaga gerbang sekolah.",
+                    "E. Meminta semua siswa segera pulang sendiri-sendiri."
+                ],
+                weights: { A: 3, B: 1, C: 5, D: 2, E: 4 }, // Pengambilan Keputusan & Kompetensi Sosial
+                rationale: "Rasional: Jawaban ini mengukur pengambilan keputusan. (5) Berkoordinasi dengan aparat dan komite adalah langkah sistemik. (4) Memulangkan siswa 'sendiri-sendiri' bisa berbahaya di jalan. (3) Meliburkan tanpa batas waktu menimbulkan kepanikan. (2) Meminta guru menjaga gerbang tidak efektif. (1) Mengabaikan situasi adalah kelalaian."
+            },
+            {
+                question: "Seorang guru muda yang inovatif mengusulkan metode pembelajaran berbasis proyek digital, namun metode ini dikritik oleh guru-guru senior karena dianggap 'terlalu banyak main'. Bagaimana Anda menengahi?",
+                options: [
+                    "A. Memihak guru senior untuk menjaga harmoni dan tradisi.",
+                    "B. Memihak guru muda dan mewajibkan semua guru memakai metodenya.",
+                    "C. Memfasilitasi diskusi, meminta guru muda mempresentasikan data/keunggulannya, dan mengusulkan uji coba di satu kelas terlebih dahulu.",
+                    "D. Membatalkan usulan tersebut untuk menghindari konflik.",
+                    "E. Menyarankan guru muda itu melakukannya di luar jam pelajaran sebagai ekskul."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 1, E: 4 }, // Kepemimpinan Pembelajaran & Inovasi
+                rationale: "Rasional: Jawaban ini mengukur kepemimpinan inovasi. (5) Memfasilitasi diskusi dan uji coba adalah cara memvalidasi inovasi. (4) Menjadikan ekskul tidak mengintegrasikannya ke kurikulum. (3) Memaksa semua memakai adalah 'top-down'. (2) Memihak senior mematikan inovasi. (1) Membatalkan adalah langkah paling tidak suportif."
+            },
+            {
+                question: "Anda baru saja dipindahtugaskan ke sekolah baru yang fasilitasnya sangat minim dan budaya kerjanya rendah. Apa fokus utama Anda di 100 hari pertama?",
+                options: [
+                    "A. Mengajukan proposal besar-besaran ke dinas untuk perbaikan fasilitas fisik.",
+                    "B. Menerapkan aturan disiplin yang sangat ketat untuk mengubah budaya kerja.",
+                    "C. Melakukan observasi, membangun hubungan (human relation) dengan guru, dan mengidentifikasi kekuatan kecil untuk dibangun bersama.",
+                    "D. Membanding-bandingkan sekolah baru ini dengan sekolah lama Anda yang lebih baik.",
+                    "E. Merenovasi ruang kerja Anda terlebih dahulu agar nyaman bekerja."
+                ],
+                weights: { A: 4, B: 3, C: 5, D: 1, E: 2 }, // Kepemimpinan & Adaptasi
+                rationale: "Rasional: Jawaban ini mengukur kepemimpinan adaptif. (5) Observasi dan membangun hubungan adalah fondasi utama perubahan. (4) Mengajukan proposal (fasilitas) penting, tapi bukan fokus utama di 100 hari pertama. (3) Menerapkan disiplin ketat tanpa 'hati' akan ditolak. (2) Renovasi ruang kerja adalah mementingkan diri sendiri. (1) Membandingkan adalah tidak profesional."
+            },
+            {
+                question: "Seorang siswa berprestasi kedapatan mencontek saat ujian akhir. Guru piket melaporkannya kepada Anda. Tata tertib sekolah jelas menyatakan sanksinya adalah nilai 0. Apa yang Anda lakukan?",
+                options: [
+                    "A. Mengabaikan laporan itu karena siswa tersebut berprestasi dan bisa merusak masa depannya.",
+                    "B. Menegakkan aturan (nilai 0), namun memanggil siswa tersebut untuk pembinaan mendalam tentang integritas.",
+                    "C. Memberi nilai 0 dan mengeluarkannya dari sekolah sebagai contoh bagi yang lain.",
+                    "D. Meminta guru piket untuk memberinya kesempatan ujian ulang secara diam-diam.",
+                    "E. Memberi nilai 0, tetapi hanya untuk ujian tersebut dan tidak memberinya pembinaan."
+                ],
+                weights: { A: 2, B: 5, C: 3, D: 1, E: 4 }, // Integritas & Pembinaan
+                rationale: "Rasional: Jawaban ini mengukur integritas dan sisi pembinaan. (5) Menegakkan aturan (disiplin) sambil membina (pedagogik) adalah seimbang. (4) Menghukum tanpa membina kurang mendidik. (3) Mengeluarkan siswa terlalu ekstrem. (2) Mengabaikan laporan merusak integritas. (1) Ujian ulang diam-diam adalah kolusi."
+            },
+            {
+                question: "Anda ingin menerapkan program 'Digitalisasi Absensi Guru', namun operator sekolah (admin) yang bertanggung jawab terlihat sangat tidak mampu secara teknis dan lamban. Apa tindakan Anda?",
+                options: [
+                    "A. Memarahinya karena ketidakmampuannya menghambat program sekolah.",
+                    "B. Mengambil alih pekerjaan tersebut dan mengerjakannya sendiri.",
+                    "C. Memindahkannya ke bagian lain dan mencari operator baru.",
+                    "D. Memberikan pelatihan intensif kepada operator tersebut dan memberinya pendampingan sampai ia mampu.",
+                    "E. Membatalkan program digitalisasi karena SDM tidak siap."
+                ],
+                weights: { A: 1, B: 3, C: 2, D: 5, E: 4 }, // Pengembangan Orang Lain
+                rationale: "Rasional: Jawaban ini mengukur pengembangan SDM. (5) Memberi pelatihan dan pendampingan adalah tugas pemimpin. (4) Membatalkan program adalah menyerah. (3) Mengerjakan sendiri tidak memberdayakan. (2) Memindahkan/mencari baru adalah jalan pintas. (1) Memarahi adalah destruktif."
+            },
+            {
+                question: "Komite sekolah (orang tua) menuntut sekolah untuk mengadakan study tour ke luar pulau yang biayanya mahal, dengan alasan 'sekolah lain juga begitu'. Padahal banyak siswa dari keluarga kurang mampu. Bagaimana sikap Anda?",
+                options: [
+                    "A. Menyetujui tuntutan tersebut agar hubungan dengan komite tetap baik.",
+                    "B. Menolak mentah-mentah karena tidak adil bagi siswa miskin.",
+                    "C. Mengadakan musyawarah dengan komite dan perwakilan orang tua, menyajikan data profil ekonomi siswa, dan mengusulkan alternatif kegiatan yang lebih inklusif.",
+                    "D. Melaksanakan study tour, namun siswa miskin tidak perlu ikut.",
+                    "E. Melaksanakan study tour, dan mencari donasi untuk mensubsidi siswa miskin."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 1, E: 4 }, // Keadilan & Kompetensi Sosial
+                rationale: "Rasional: Jawaban ini mengukur keadilan dan komunikasi. (5) Musyawarah dengan data dan mencari alternatif inklusif adalah paling bijak. (4) Mencari donasi (poin E) baik, tapi tetap memaksakan program mahal. (3) Menolak mentah-mentah bisa memicu konflik. (2) Menyetujui mengabaikan siswa miskin. (1) Poin D adalah diskriminatif."
+            },
+            {
+                question: "Saat supervisi kelas, Anda menemukan bahwa metode mengajar seorang guru sangat monoton dan tidak efektif. Ini sudah Anda temukan berulang kali. Apa yang Anda lakukan?",
+                options: [
+                    "A. Menegurnya langsung di depan siswa agar ada efek jera.",
+                    "B. Mengambil alih kelas dan menunjukkan cara mengajar yang benar.",
+                    "C. Mengajak guru tersebut bicara pasca-supervisi, menyampaikan data observasi, dan bersama-sama merencanakan perbaikan (coaching).",
+                    "D. Membiarkannya, karena guru tersebut akan segera pensiun.",
+                    "E. Melaporkannya ke pengawas untuk ditindaklanjuti."
+                ],
+                weights: { A: 1, B: 2, C: 5, D: 3, E: 4 }, // Supervisi & Kepemimpinan Pembelajaran
+                rationale: "Rasional: Jawaban ini mengukur supervisi akademik. (5) 'Coaching' pasca-supervisi dengan data adalah inti dari supervisi. (4) Melapor ke pengawas adalah 'melempar' tanggung jawab pembinaan internal. (3) Membiarkan karena mau pensiun adalah kelalaian. (2) Mengambil alih kelas memalukan guru. (1) Menegur di depan siswa sangat tidak etis."
+            },
+            {
+                question: "Anda merasa salah satu wakil kepala sekolah yang Anda tunjuk tidak bekerja efektif (kurang inisiatif dan sering mendelegasikan kembali tugas ke Anda). Bagaimana Anda menyikapinya?",
+                options: [
+                    "A. Langsung menggantinya dengan orang lain yang lebih kompeten.",
+                    "B. Mengambil kembali semua tugasnya agar pekerjaan cepat selesai.",
+                    "C. Mengeluhkannya kepada guru-guru lain agar dia merasa tertekan.",
+                    "D. Melakukan evaluasi kinerja, memberikan umpan balik yang jelas, dan menetapkan target kinerja (KPI) yang terukur.",
+                    "E. Memberinya lebih banyak pekerjaan dengan harapan dia akan belajar."
+                ],
+                weights: { A: 3, B: 2, C: 1, D: 5, E: 4 }, // Manajerial & Etos Kerja
+                rationale: "Rasional: Jawaban ini mengukur manajemen kinerja. (5) Evaluasi, umpan balik, dan KPI terukur adalah langkah profesional. (4) Memberi lebih banyak pekerjaan tanpa arahan akan memperburuk. (3) Langsung mengganti tanpa pembinaan itu otoriter. (2) Mengambil alih tugas tidak menyelesaikan masalah. (1) Mengeluh (bergosip) sangat tidak profesional."
+            },
+            {
+                question: "Di media sosial, seorang wali murid menulis status yang menyudutkan sekolah Anda terkait pungutan liar (padahal itu adalah sumbangan sukarela yang disepakati komite). Postingan itu viral. Apa yang Anda lakukan?",
+                options: [
+                    "A. Menyerang balik wali murid tersebut di kolom komentar dengan data yang Anda miliki.",
+                    "B. Meminta komite sekolah untuk membuat klarifikasi resmi di media sosial.",
+                    "C. Segera menghubungi wali murid tersebut secara pribadi untuk menjernihkan miskomunikasi, dan membuat rilis resmi sekolah jika diperlukan.",
+                    "D. Diam saja dan menunggu masalahnya reda sendiri.",
+                    "E. Meminta bantuan 'buzzer' untuk memberi komentar positif di postingan tersebut."
+                ],
+                weights: { A: 1, B: 4, C: 5, D: 3, E: 2 }, // Kematangan Emosi & Komunikasi
+                rationale: "Rasional: Jawaban ini mengukur manajemen krisis. (5) Menghubungi pribadi (menjernihkan) dan rilis resmi (klarifikasi) adalah langkah ganda yang efektif. (4) Meminta komite (pihak ketiga) juga baik, tapi lebih lambat. (3) Diam saja membuat isu liar. (2) Menggunakan 'buzzer' tidak etis. (1) Menyerang balik di medsos memperburuk citra."
+            },
+            {
+                question: "Anda ditawari untuk menjadi 'keynote speaker' di seminar pendidikan bergengsi di luar kota, namun di hari yang sama, sekolah Anda mengadakan acara 'Gelar Karya Siswa' yang sudah lama direncanakan. Apa keputusan Anda?",
+                options: [
+                    "A. Memilih pergi ke seminar karena itu penting untuk citra diri dan jaringan Anda.",
+                    "B. Membatalkan acara 'Gelar Karya Siswa' agar Anda bisa pergi ke seminar.",
+                    "C. Tetap di sekolah untuk menghadiri dan mendukung 'Gelar Karya Siswa', dan mengirimkan video sambutan untuk seminar.",
+                    "D. Hadir di 'Gelar Karya Siswa' sebentar, lalu terburu-buru pergi ke bandara untuk mengejar seminar.",
+                    "E. Mendelegasikan sepenuhnya 'Gelar Karya Siswa' kepada wakil dan Anda pergi ke seminar."
+                ],
+                weights: { A: 2, B: 1, C: 5, D: 3, E: 4 }, // Integritas & Komitmen (Prioritas)
+                rationale: "Rasional: Jawaban ini mengukur prioritas dan komitmen. (5) Hadir untuk siswa adalah prioritas utama (komitmen), dan mengirim video adalah solusi (win-win). (4) Mendelegasikan penuh (poin E) menunjukkan seminar lebih penting. (3) Hadir sebentar (poin D) tidak fokus. (2) Pergi ke seminar mengorbankan siswa. (1) Membatalkan acara siswa adalah pilihan terburuk."
+            },
+            
+            // ===================================
+            // == 23 SOAL KOMPETENSI SOSIAL ==
+            // ===================================
+            {
+                question: "Seorang wali murid yang sangat vokal menulis keluhan pedas tentang kebijakan seragam baru di grup WhatsApp wali murid, dan banyak orang tua lain 'memanasi' situasi. Apa tindakan Anda?",
+                options: [
+                    "A. Langsung membalas di grup dengan data dan argumen untuk membantah keluhan tersebut.",
+                    "B. Mengeluarkan wali murid tersebut dari grup karena dianggap provokatif.",
+                    "C. Mendiamkan grup dan berharap situasinya reda dengan sendirinya.",
+                    "D. Menulis di grup dengan tenang, mengakui masukan, dan mengundang perwakilan wali murid untuk audiensi/diskusi di sekolah.",
+                    "E. Menghubungi (Japri) wali murid tersebut dan memintanya menghapus postingan karena membuat gaduh."
+                ],
+                weights: { A: 3, B: 1, C: 2, D: 5, E: 4 }, // Komunikasi & De-eskalasi
+                rationale: "Rasional: (5) Mengajak audiensi adalah de-eskalasi, transparan, dan profesional. (4) Japri baik untuk personal, tapi (5) lebih transparan. (3) Berdebat di grup WA tidak efektif dan bisa memperburuk. (2) Mendiamkan adalah pasif. (1) Mengeluarkan adalah tindakan otoriter dan merusak hubungan."
+            },
+            {
+                question: "Masyarakat sekitar sekolah mengeluhkan siswa yang parkir motor sembarangan dan membuat bising saat jam pulang. Keluhan ini disampaikan melalui RT setempat. Bagaimana Anda merespons?",
+                options: [
+                    "A. Mengabaikan keluhan karena itu terjadi di luar area sekolah.",
+                    "B. Meminta maaf kepada RT, dan segera membuat aturan internal yang ketat (misal, sanksi) bagi siswa.",
+                    "C. Mendatangi RT untuk berdialog, meminta maaf, dan menawarkan solusi bersama (misal, penataan parkir dan patroli guru piket saat pulang).",
+                    "D. Menyalahkan pihak RT karena tidak menyediakan lahan parkir untuk warga.",
+                    "E. Meminta RT untuk langsung menindak siswa yang melanggar."
+                ],
+                weights: { A: 1, B: 4, C: 5, D: 2, E: 3 }, // Hubungan Masyarakat
+                rationale: "Rasional: (5) Dialog dan solusi bersama menunjukkan kolaborasi dan tanggung jawab. (4) Membuat aturan internal baik, tapi (5) melibatkan dialog dengan RT. (3) Meminta RT menindak adalah lempar tanggung jawab. (2) Menyalahkan RT adalah defensif. (1) Mengabaikan adalah tidak peduli."
+            },
+            {
+                question: "Anda ingin membangun kemitraan dengan Dunia Usaha (DUDI) untuk program magang siswa SMK. Perusahaan lokal tampak tidak tertarik. Apa langkah Anda?",
+                options: [
+                    "A. Menghentikan program magang karena DUDI tidak mendukung.",
+                    "B. Mengirim proposal ke sebanyak mungkin perusahaan dan menunggu jawaban.",
+                    "C. Mengidentifikasi 1-2 perusahaan potensial, meminta waktu audiensi untuk mempresentasikan 'nilai lebih' apa yang sekolah tawarkan, bukan hanya 'meminta'.",
+                    "D. Melaporkan ke Dinas bahwa DUDI di wilayah Anda tidak kooperatif.",
+                    "E. Mewajibkan siswa mencari tempat magang sendiri."
+                ],
+                weights: { A: 1, B: 3, C: 5, D: 2, E: 4 }, // Jejaring & Kemitraan
+                rationale: "Rasional: (5) Audiensi proaktif dengan 'menjual' nilai lebih adalah inti dari jejaring. (4) Siswa mencari sendiri adalah standar, tapi (5) adalah inisiatif kepala sekolah. (3) Mengirim proposal (pasif) kurang efektif. (2) Melapor ke dinas tidak solutif. (1) Menghentikan program adalah menyerah."
+            },
+            {
+                question: "Sekolah Anda memiliki beberapa siswa dari keluarga sangat miskin yang sering tidak masuk karena harus membantu orang tua bekerja. Apa yang Anda lakukan sebagai pemimpin?",
+                options: [
+                    "A. Memberlakukan aturan absensi dengan ketat dan memanggil orang tua untuk teguran.",
+                    "B. Membiarkan saja karena memahami kondisi ekonomi mereka.",
+                    "C. Mengaktifkan tim/guru BK untuk kunjungan rumah (home visit), memahami masalahnya, dan mencari solusi (misal, bantuan, program sekolah sore).",
+                    "D. Mengeluarkan siswa tersebut agar tidak merusak data absensi sekolah.",
+                    "E. Memberi bantuan uang pribadi Anda sesekali."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 1, E: 4 }, // Empati & Pelayanan Berkeadilan
+                rationale: "Rasional: (5) Home visit dan mencari solusi sistemik (pelayanan) adalah yang paling tepat. (4) Bantuan pribadi baik tapi tidak berkelanjutan. (3) Membiarkan adalah pembiaran. (2) Memberlakukan aturan kaku (A) tidak berempati. (1) Mengeluarkan adalah pelanggaran hak belajar."
+            },
+            {
+                question: "Dalam rapat komite sekolah, terjadi perdebatan panas antara dua kubu orang tua mengenai iuran kegiatan ekstrakurikuler. Suasana menjadi tegang. Apa peran Anda?",
+                options: [
+                    "A. Memihak pada kubu yang idenya Anda anggap paling benar.",
+                    "B. Menunda rapat dan membubarkannya untuk menghindari konflik.",
+                    "C. Bertindak sebagai moderator, menenangkan kedua pihak, dan mengembalikan diskusi ke data/fakta kebutuhan siswa.",
+                    "D. Melakukan voting saat itu juga agar cepat selesai.",
+                    "E. Mengatakan bahwa ini urusan komite, sekolah akan ikut keputusan akhir saja."
+                ],
+                weights: { A: 1, B: 3, C: 5, D: 4, E: 2 }, // Mediasi & Komunikasi
+                rationale: "Rasional: (5) Bertindak sebagai moderator dan mengembalikan ke data adalah peran kepemimpinan sosial. (4) Voting bisa memecah belah jika dilakukan saat panas. (3) Menunda rapat mungkin perlu, tapi (5) adalah upaya pertama. (2) 'Ikut saja' adalah pasif. (1) Memihak adalah tidak adil."
+            },
+            {
+                question: "Sekolah Anda ingin mengadakan 'Pekan Budaya' yang menampilkan beragam tradisi. Sekelompok orang tua menolak karena dianggap 'tidak sesuai' dengan ajaran agama tertentu. Bagaimana Anda merespons?",
+                options: [
+                    "A. Membatalkan acara untuk menghindari konflik SARA.",
+                    "B. Tetap menjalankan acara tanpa mempedulikan protes mereka.",
+                    "C. Mengundang perwakilan kelompok tersebut, menjelaskan bahwa acara ini adalah pendidikan toleransi dan kebinekaan, bukan ritual keagamaan.",
+                    "D. Mengganti acara menjadi 'Pekan Budaya' yang hanya berisi satu budaya mayoritas.",
+                    "E. Melaporkan kelompok orang tua tersebut ke polisi atas tuduhan intoleransi."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 1, E: 4 }, // Inklusivitas & Toleransi
+                rationale: "Rasional: (5) Dialog dan edukasi adalah cara terbaik menangani perbedaan pandangan sosial. (4) Melaporkan (E) eskalatif. (3) Tetap menjalankan (B) mengabaikan masukan. (2) Membatalkan (A) adalah menyerah pada tekanan. (1) Poin D adalah diskriminatif."
+            },
+            {
+                question: "Anda diminta memberi sambutan di acara Musrenbang (Musyawarah Perencanaan Pembangunan) tingkat kelurahan. Apa yang Anda prioritaskan dalam sambutan Anda?",
+                options: [
+                    "A. Memamerkan semua prestasi dan kehebatan sekolah Anda.",
+                    "B. Mengeluhkan semua kekurangan sekolah (fasilitas rusak, dll) dan meminta bantuan.",
+                    "C. Menjelaskan visi sekolah dan mengusulkan program kolaborasi yang bisa dikerjakan bersama antara sekolah dan masyarakat/kelurahan.",
+                    "D. Memberi sambutan formalitas yang singkat agar cepat selesai.",
+                    "E. Mengkritik program kelurahan yang tidak mendukung pendidikan."
+                ],
+                weights: { A: 3, B: 2, C: 5, D: 4, E: 1 }, // Jejaring & Komunikasi Publik
+                rationale: "Rasional: (5) Mengusulkan kolaborasi adalah inti dari jejaring sosial. (4) Formalitas (D) tidak memanfaatkan momentum. (3) Pamer (A) terkesan arogan. (2) Mengeluh (B) terkesan lemah. (1) Mengkritik (E) tidak pada tempatnya."
+            },
+            {
+                question: "Seorang guru baru (muda) mengeluh karena merasa 'tidak dianggap' dan sering diberi tugas-tugas 'remeh' oleh guru-guru senior. Bagaimana Anda menciptakan iklim sosial yang lebih baik?",
+                options: [
+                    "A. Menasihati guru muda tersebut untuk sabar dan menghormati senior.",
+                    "B. Menegur guru senior karena melakukan 'perpeloncoan'.",
+                    "C. Menciptakan program 'mentoring' terstruktur dimana guru senior dibimbing untuk membina guru muda, dan membuat program kolaborasi tim lintas generasi.",
+                    "D. Memisahkan ruang kerja guru muda dan guru senior.",
+                    "E. Mengabaikannya, karena itu dinamika biasa di ruang guru."
+                ],
+                weights: { A: 3, B: 4, C: 5, D: 1, E: 2 }, // Membangun Iklim Kerja Positif
+                rationale: "Rasional: (5) Menciptakan program terstruktur (sistemik) adalah solusi jangka panjang. (4) Menegur senior (B) bisa jadi konflik. (3) Menasihati guru muda (A) tidak menyelesaikan akar masalah. (2) Mengabaikan (E) adalah pembiaran. (1) Memisahkan (D) memperburuk segregasi."
+            },
+            {
+                question: "Seorang siswa di sekolah Anda adalah atlet berprestasi tinggi namun berasal dari keluarga yang sangat arogan. Orang tuanya sering 'mengatur' guru dan menuntut perlakuan khusus untuk anaknya. Apa sikap Anda?",
+                options: [
+                    "A. Menuruti semua kemauan orang tua tersebut demi menjaga prestasi atlet.",
+                    "B. Memberi sanksi kepada siswa tersebut agar orang tuanya sadar.",
+                    "C. Memanggil orang tua, mengapresiasi prestasi siswa, namun dengan tegas menetapkan batas (boundaries) bahwa aturan sekolah berlaku untuk semua.",
+                    "D. Mengabaikan orang tuanya dan hanya fokus pada prestasi siswa.",
+                    "E. Meminta guru-guru untuk 'mengalah' demi kebaikan nama sekolah."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 4, E: 1 }, // Kompetensi Sosial & Ketegasan
+                rationale: "Rasional: (5) Apresiasi DULU, baru tetapkan batasan (boundaries) adalah komunikasi asertif. (4) Mengabaikan (D) bisa jadi masalah nanti. (3) Memberi sanksi ke siswa (B) salah sasaran. (2) Menuruti (A) merusak sistem. (1) Meminta guru mengalah (E) merusak wibawa guru."
+            },
+            {
+                question: "Bagaimana cara Anda yang paling efektif untuk mengkomunikasikan visi dan misi sekolah kepada seluruh warga sekolah (guru, siswa, staf, orang tua)?",
+                options: [
+                    "A. Memasang poster visi-misi di setiap sudut sekolah.",
+                    "B. Menyampaikannya sekali saja saat rapat besar di awal tahun.",
+                    "C. Menerjemahkan visi-misi menjadi program kerja nyata dan mengkomunikasikannya berulang-ulang dalam setiap rapat, briefing pagi, dan pertemuan orang tua.",
+                    "D. Membuat buku panduan visi-misi dan membagikannya ke semua orang.",
+                    "E. Visi-misi adalah urusan kepala sekolah, yang lain cukup bekerja."
+                ],
+                weights: { A: 3, B: 2, C: 5, D: 4, E: 1 }, // Komunikasi Sosial Internal
+                rationale: "Rasional: (5) Diterjemahkan jadi program dan diulang-ulang (repetisi) adalah komunikasi visi yang efektif. (4) Buku panduan (D) dan (3) Poster (A) hanya alat, pasif. (2) Sekali saja (B) tidak cukup. (1) Poin E adalah pandangan kuno."
+            },
+            {
+                question: "Sekolah Anda kedatangan siswa baru (pindahan) yang merupakan penyandang disabilitas (kursi roda). Sekolah Anda belum sepenuhnya ramah disabilitas. Apa prioritas sosial Anda?",
+                options: [
+                    "A. Menyarankan orang tuanya mencari sekolah luar biasa (SLB).",
+                    "B. Menerimanya, dan membiarkan siswa tersebut beradaptasi sendiri.",
+                    "C. Mengumpulkan guru dan siswa (OSIS) untuk 'mensosialisasikan' cara berinteraksi dan membantu teman baru mereka, sambil mengupayakan perbaikan fasilitas.",
+                    "D. Membangun ramp dan toilet khusus dulu, baru siswa boleh masuk.",
+                    "E. Menempatkan siswa di ruang khusus terpisah agar tidak merepotkan."
+                ],
+                weights: { A: 1, B: 2, C: 5, D: 4, E: 3 }, // Inklusivitas & Empati
+                rationale: "Rasional: (5) Membangun kesadaran sosial (guru/siswa) adalah prioritas SAMA pentingnya dengan fisik. (4) Membangun fisik (D) penting, tapi (5) mencakup sosialnya. (3) Poin E adalah diskriminasi. (2) Membiarkan (B) tidak suportif. (1) Menolak (A) melanggar hak."
+            },
+            {
+                question: "Anda mendengar kabar bahwa pengurus RT/RW di sekitar sekolah merasa 'tidak pernah dilibatkan' oleh sekolah dalam kegiatan apapun. Apa inisiatif Anda?",
+                options: [
+                    "A. Mengabaikan, karena urusan sekolah dan RT/RW memang berbeda.",
+                    "B. Mengirimkan surat permohonan maaf formal kepada mereka.",
+                    "C. Mengagendakan kunjungan (silaturahmi) ke pengurus RT/RW, dan mulai mengundang mereka secara resmi di acara sekolah (misal: 17 Agustus, Porseni).",
+                    "D. Menunggu mereka yang mendatangi sekolah jika ada perlu.",
+                    "E. Mengirimkan sumbangan atas nama sekolah saat ada acara 17 Agustus di RT."
+                ],
+                weights: { A: 1, B: 3, C: 5, D: 2, E: 4 }, // Hubungan Masyarakat
+                rationale: "Rasional: (5) Proaktif silaturahmi dan melibatkan adalah inti membangun hubungan. (4) Mengirim sumbangan (E) baik, tapi (5) lebih ke pelibatan. (3) Surat (B) terlalu formal. (2) Menunggu (D) adalah pasif. (1) Mengabaikan (A) merusak hubungan."
+            },
+            {
+                question: "Seorang tokoh masyarakat/ulama lokal yang dihormati, memiliki pandangan yang berbeda dengan program 'Pendidikan Kesehatan Reproduksi' di sekolah Anda. Beliau menyampaikannya di forum warga. Apa yang Anda lakukan?",
+                options: [
+                    "A. Menyerang pandangan beliau di forum yang sama dengan data ilmiah.",
+                    "B. Menghentikan program kespro untuk menghormati beliau.",
+                    "C. Melakukan 'kunjungan' khusus (silaturahmi) ke beliau, menjelaskan tujuan program dari sisi perlindungan anak, dan mencari titik temu/dukungan.",
+                    "D. Menjalankan program secara diam-diam agar tidak ketahuan beliau.",
+                    "E. Meminta Dinas Pendidikan untuk 'menegur' tokoh masyarakat tersebut."
+                ],
+                weights: { A: 2, B: 1, C: 5, D: 3, E: 4 }, // Komunikasi Persuasif & Jejaring
+                rationale: "Rasional: (5) 'Tabayyun' atau silaturahmi untuk menjelaskan dan mencari dukungan adalah diplomasi sosial tertinggi. (4) Meminta dinas (E) eskalatif. (3) Diam-diam (D) tidak transparan. (2) Menyerang (A) adalah 'head-on' yang buruk. (1) Menghentikan program (B) adalah kalah."
+            },
+            {
+                question: "Dalam tim manajemen Anda (Wakil-wakil KS), ada satu wakil yang sangat kompeten secara teknis namun sangat kaku dan tidak pandai berkomunikasi, sehingga sering berkonflik dengan guru. Apa yang Anda lakukan?",
+                options: [
+                    "A. Memecatnya karena 'toxic' secara sosial.",
+                    "B. Membiarkannya, yang penting pekerjaan teknisnya selesai.",
+                    "C. Memberinya 'coaching' khusus tentang komunikasi interpersonal dan memintanya memimpin proyek yang membutuhkan kolaborasi ringan dulu.",
+                    "D. Mengambil alih semua tugas yang berhubungan dengan guru darinya.",
+                    "E. Mengumumkan di rapat bahwa semua guru harus memaklumi sifat wakil tersebut."
+                ],
+                weights: { A: 2, B: 1, C: 5, D: 3, E: 4 }, // Pembinaan Kompetensi Sosial Tim
+                rationale: "Rasional: (5) Memberi coaching (pembinaan) adalah tugas pemimpin untuk mengembangkan tim. (4) Meminta guru memaklumi (E) tidak adil bagi guru. (3) Mengambil alih (D) tidak memberdayakan. (2) Memecat (A) terlalu ekstrem. (1) Membiarkan (B) merusak iklim kerja."
+            },
+            {
+                question: "Sekolah Anda ingin membuka 'Kantin Sehat' bekerjasama dengan UKM/warga sekitar. Bagaimana proses seleksi mitra yang paling mencerminkan kompetensi sosial?",
+                options: [
+                    "A. Memilih UKM milik keluarga guru agar lebih mudah diawasi.",
+                    "B. Membuka tender terbuka dengan proposal terbaik yang menang, tanpa pandang bulu.",
+                    "C. Memprioritaskan UKM milik wali murid/warga sekitar yang paling membutuhkan, lalu memberi mereka pelatihan standar kesehatan.",
+                    "D. Memasak sendiri (dikelola sekolah) agar pasti sehat.",
+                    "E. Memilih UKM yang memberikan 'komisi' paling besar untuk sekolah."
+                ],
+                weights: { A: 3, B: 4, C: 5, D: 2, E: 1 }, // Pemberdayaan Masyarakat
+                rationale: "Rasional: (5) Prioritas warga sekitar + pelatihan (pemberdayaan) adalah fungsi sosial sekolah. (4) Tender terbuka (B) adil, tapi (5) lebih berdimensi sosial. (3) Milik guru (A) bisa jadi nepotisme. (2) Dikelola sendiri (D) membuang peluang sosial. (1) Komisi (E) melanggar integritas."
+            },
+            {
+                question: "Seorang guru senior yang Anda hormati, memberikan masukan kepada Anda secara pribadi. Masukan tersebut valid, namun disampaikan dengan cara yang sangat 'menggurui' dan meremehkan Anda. Bagaimana respons sosial Anda?",
+                options: [
+                    "A. Langsung memotongnya dan berkata 'Saya tahu, tidak perlu menggurui saya'.",
+                    "B. Mendengarkan, lalu setelah selesai, tidak pernah lagi meminta masukannya.",
+                    "C. Tersenyum, mengucapkan terima kasih atas masukannya, dan (secara terpisah) merefleksikan 'isi' masukannya.",
+                    "D. Mendengarkan, lalu membalas 'Terima kasih, Pak. Tapi saya akan lebih nyaman jika Bapak menyampaikannya dengan cara...'." ,
+                    "E. Menerima masukannya, dan langsung mengubah cara kerja Anda agar beliau senang."
+                ],
+                weights: { A: 1, B: 2, C: 4, D: 5, E: 3 }, // Komunikasi Asertif & Kematangan
+                rationale: "Rasional: (5) Poin D (asertif) adalah yang terbaik; menghargai isi, tapi memberi umpan balik cara penyampaian. (4) Poin C baik (matang), tapi tidak memberi umpan balik (pasif). (3) Poin E (submisif). (2) Poin B (pasif-agresif). (1) Poin A (agresif)."
+            },
+            {
+                question: "Anda perlu menggalang dana besar dari Komite/Orang Tua untuk perbaikan aula. Apa strategi komunikasi Anda agar efektif dan transparan?",
+                options: [
+                    "A. Mengumumkan di grup WA bahwa sekolah butuh uang dan memberikan nomor rekening.",
+                    "B. Mengundang komite, memaparkan urgensi, rincian RAB, dan membentuk panitia penggalangan dana yang melibatkan orang tua.",
+                    "C. Memanggil 1-2 orang tua 'kaya' dan meminta mereka menanggung semua biayanya.",
+                    "D. Menaikkan uang SPP secara sepihak dan mengalokasikan selisihnya untuk aula.",
+                    "E. Membuat proposal 'seadanya' dan membiarkan komite yang mencari dana sendiri."
+                ],
+                weights: { A: 2, B: 5, C: 4, D: 1, E: 3 }, // Transparansi & Pelibatan
+                rationale: "Rasional: (5) Transparansi (RAB) dan pelibatan (panitia) adalah kunci. (4) Meminta 1-2 orang (C) bisa jadi solusi, tapi (5) lebih partisipatif. (3) Poin E pasif. (2) Poin A tidak transparan. (1) Poin D ilegal (jika sekolah negeri) dan tidak transparan."
+            },
+            {
+                question: "Sekolah Anda (SD) bersebelahan dengan SMP. Siswa Anda sering berkelahi dengan siswa SMP tersebut di jam pulang. Apa langkah kolaboratif yang Anda ambil?",
+                options: [
+                    "A. Melaporkan SMP tersebut ke Dinas Pendidikan karena siswanya nakal.",
+                    "B. Menempatkan satpam sekolah Anda di gerbang SMP untuk 'berjaga'.",
+                    "C. Menghubungi Kepala Sekolah SMP, menjadwalkan pertemuan, dan merencanakan program bersama (misal: patroli gabungan, kegiatan olahraga persahabatan).",
+                    "D. Meminta siswa Anda untuk tidak keluar gerbang sebelum siswa SMP pulang.",
+                    "E. Mengadakan latihan bela diri untuk siswa SD Anda."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 4, E: 1 }, // Kolaborasi Antar Lembaga
+                rationale: "Rasional: (5) Menghubungi Kasek dan program bersama adalah kolaborasi sejati. (4) Poin D solusi jangka pendek, tapi (5) menyelesaikan akar. (3) Poin B bisa memicu konflik. (2) Poin A eskalatif. (1) Poin E tidak relevan."
+            },
+            {
+                question: "Seorang alumni sukses ingin 'berbagi' dengan sekolah. Apa cara Anda memanfaatkan 'jaringan' ini yang paling berdampak sosial?",
+                options: [
+                    "A. Memintanya menyumbang uang tunai untuk kas sekolah.",
+                    "B. Memintanya merenovasi ruang kepala sekolah agar representatif.",
+                    "C. Memintanya menjadi 'mentor' atau pembicara tamu untuk memotivasi siswa tentang dunia kerja dan kewirausahaan.",
+                    "D. Memasang foto alumni tersebut besar-besar di lobi sekolah.",
+                    "E. Menamakan gedung sekolah dengan nama alumni tersebut."
+                ],
+                weights: { A: 3, B: 1, C: 5, D: 2, E: 4 }, // Pemanfaatan Jejaring
+                rationale: "Rasional: (5) Meminta 'ilmu' dan 'inspirasi' (mentoring) seringkali lebih berdampak jangka panjang daripada uang. (4) Menamakan gedung (E) atau (3) uang tunai (A) juga baik, tapi (5) adalah dampak sosial langsung ke siswa. (2) Foto (D) dan (1) Ruang KS (B) hanya fisik."
+            },
+            {
+                question: "Bagaimana cara Anda 'menjual' (mempromosikan) sekolah Anda ke masyarakat agar PPDB (Penerimaan Peserta Didik Baru) tahun depan lebih baik?",
+                options: [
+                    "A. Memasang spanduk besar-besaran di setiap perempatan jalan.",
+                    "B. Menawarkan 'diskon' atau 'cashback' bagi yang mendaftar lebih awal.",
+                    "C. Menggunakan media sosial sekolah secara aktif sepanjang tahun (bukan hanya saat PPDB) untuk menunjukkan 'cerita' dan 'proses' belajar yang unik di sekolah.",
+                    "D. Memberi 'bonus' kepada guru yang bisa membawa siswa baru.",
+                    "E. Mengkritik sekolah lain agar sekolah Anda terlihat lebih baik."
+                ],
+                weights: { A: 3, B: 2, C: 5, D: 4, E: 1 }, // Komunikasi Publik & Promosi
+                rationale: "Rasional: (5) Promosi 'soft-selling' (storytelling) sepanjang tahun membangun citra otentik. (4) Poin D (bonus) bisa jadi strategi, tapi (5) lebih baik. (3) Spanduk (A) tradisional. (2) Diskon (B) seperti jualan. (1) Mengkritik (E) tidak etis."
+            },
+            {
+                question: "Anda menerima keluhan dari guru-guru bahwa staf Tata Usaha (TU) 'tidak ramah' dan 'mempersulit' urusan administrasi. Padahal staf TU adalah bawahan Anda. Apa yang Anda lakukan?",
+                options: [
+                    "A. Mengabaikan, karena guru dan TU memang sering tidak akur.",
+                    "B. Memanggil semua guru dan meminta mereka memaklumi beban kerja TU.",
+                    "C. Memanggil semua staf TU dan memarahi mereka karena tidak 'service-oriented'.",
+                    "D. Mengadakan rapat bersama guru dan TU untuk memetakan alur layanan (SOP), lalu memberikan pelatihan 'service excellence' kepada TU.",
+                    "E. Memindahkan semua staf TU yang dikeluhkan."
+                ],
+                weights: { A: 1, B: 2, C: 3, D: 5, E: 4 }, // Membangun Budaya Layanan
+                rationale: "Rasional: (5) Memperbaiki sistem (SOP) dan membina (pelatihan) adalah solusi manajerial dan sosial. (4) Memindahkan (E) adalah jalan pintas. (3) Memarahi (C) tidak solutif. (2) Meminta guru maklum (B) tidak adil. (1) Mengabaikan (A) adalah pembiaran."
+            },
+            {
+                question: "Seorang siswa di sekolah Anda diduga terlibat dalam geng motor di luar jam sekolah. Kabar ini sudah menyebar di kalangan orang tua dan meresahkan. Apa langkah sosial pertama Anda?",
+                options: [
+                    "A. Mengumumkan di grup WA bahwa kabar itu 'hoax' agar orang tua tenang.",
+                    "B. Menskors siswa yang bersangkutan agar sekolah terlihat tegas.",
+                    "C. Memanggil siswa dan orang tuanya untuk klarifikasi, dan berkoordinasi dengan aparat (Polisi/Babinsa) untuk pembinaan.",
+                    "D. Menggeledah tas semua siswa setiap hari untuk mencari senjata tajam.",
+                    "E. Diam saja, karena itu terjadi di luar sekolah."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 4, E: 1 }, // Respon Krisis Sosial
+                rationale: "Rasional: (5) Klarifikasi (internal) dan koordinasi (eksternal/aparat) adalah langkah tepat. (4) Menggeledah (D) reaktif, tapi (5) lebih ke akar. (3) Menskors (B) tanpa bukti adalah salah. (2) Menyebut 'hoax' (A) bisa jadi salah jika ternyata benar. (1) Diam (E) adalah kelalaian."
+            },
+            {
+                question: "Anda ingin guru-guru Anda lebih kolaboratif, tidak bekerja sendiri-sendiri. Program apa yang akan Anda galakkan untuk membangun kompetensi sosial guru?",
+                options: [
+                    "A. Mewajibkan semua guru untuk saling mengunjungi kelas (peer observation).",
+                    "B. Mengadakan 'outbound' atau 'gathering' guru setiap bulan agar akrab.",
+                    "C. Membuat program 'Lesson Study' atau 'Komunitas Belajar (Kombel)' yang terstruktur, dimana guru merencanakan, mengajar, dan merefleksi bersama.",
+                    "D. Memberi insentif bagi guru yang paling banyak berkolaborasi.",
+                    "E. Menyusun RPP bersama-sama di awal tahun saja."
+                ],
+                weights: { A: 4, B: 3, C: 5, D: 2, E: 1 }, // Membangun Kolaborasi Internal
+                rationale: "Rasional: (5) Lesson Study/Kombel adalah kolaborasi profesional yang terstruktur dan berdampak. (4) Peer observation (A) bagian dari itu. (3) Outbound (B) hanya membangun keakraban, belum tentu kolaborasi kerja. (2) Insentif (D) bisa jadi bumerang. (1) RPP bersama (E) terlalu minim."
+            },
 
-            // === KOMPETENSI SOSIAL (23 Soal) ===
+            // ======================================
+            // == 24 SOAL KOMPETENSI PROFESIONAL ==
+            // ======================================
             {
-                id: "q24",
-                component: "sosial",
-                question: "Tokoh masyarakat setempat meminta izin untuk menggunakan lapangan sekolah untuk acara kampanye politik. Tokoh ini berpengaruh dan telah banyak membantu sekolah. Sikap Anda?",
+                question: "Saat supervisi akademik, Anda menemukan seorang guru senior mengajar dengan metode ceramah yang monoton dan tidak melibatkan siswa. Padahal materi yang diajarkan adalah IPA. Apa tindak lanjut Anda?",
                 options: [
-                    { text: "Langsung mengizinkan untuk menjaga hubungan baik, tanpa mempedulikan potensi masalah.", weight: 1 },
-                    { text: "Mengatakan Anda akan 'mempertimbangkannya' dan berharap mereka lupa, sambil menghindari telepon mereka.", weight: 2 },
-                    { text: "Mengizinkan, tetapi dengan syarat yang sangat ketat dan meminta 'sumbangan' untuk sekolah.", weight: 3 },
-                    { text: "Menolak permintaan tersebut dengan tegas namun sopan, dengan mengutip peraturan yang berlaku.", weight: 4 },
-                    { text: "Menjelaskan secara diplomatis bahwa regulasi (zona netral) melarang fasilitas sekolah untuk politik, namun menawarkan kolaborasi untuk acara lain yang netral.", weight: 5 }
+                    "A. Menegurnya langsung di akhir pelajaran bahwa metodenya sudah kuno.",
+                    "B. Mengambil alih kelas saat itu juga untuk mencontohkan cara mengajar yang benar.",
+                    "C. Mengajak guru tersebut refleksi pasca-observasi, menanyakan apa kesulitannya, dan bersama-sama merancang perbaikan untuk pertemuan berikutnya (coaching).",
+                    "D. Meminta guru lain yang lebih muda untuk mengajari guru senior tersebut.",
+                    "E. Mendiamkannya karena menghormati senioritas guru tersebut."
                 ],
-                rational_best: "Alasan (Skor 5): Ini adalah 'Assertive-Diplomatic'. Menegakkan aturan (integritas) sambil tetap menjaga hubungan sosial (menawarkan alternatif) adalah solusi terbaik.",
-                rational_worst: "Alasan (Skor 1): Mengorbankan netralitas sekolah (zona pendidikan) untuk kepentingan pribadi/politik, melanggar aturan dan berisiko tinggi."
+                weights: { A: 2, B: 1, C: 5, D: 4, E: 3 }, // Supervisi & Kepemimpinan Pembelajaran
+                rationale: "Rasional: (5) Supervisi modern bersifat 'coaching' (kolaboratif dan reflektif), bukan menghakimi. (4) Poin D baik, tapi (5) adalah pelibatan langsung KS. (3) Mendiamkan adalah pembiaran. (2) Menegur langsung (A) bersifat 'judging'. (1) Mengambil alih (B) mempermalukan guru."
             },
             {
-                id: "q25",
-                component: "sosial",
-                question: "Sekelompok orang tua siswa memprotes kebijakan 'kantin sehat' Anda yang melarang penjualan makanan instan, karena dianggap merepotkan. Mereka datang ke sekolah dengan emosi. Bagaimana Anda menghadapinya?",
+                question: "Data Rapor Pendidikan sekolah Anda menunjukkan kemampuan literasi siswa stagnan selama 3 tahun. Apa langkah manajerial pertama yang Anda ambil?",
                 options: [
-                    { text: "Menolak bertemu karena mereka datang dengan cara yang tidak sopan.", weight: 1 },
-                    { text: "Menemui mereka dan berdebat bahwa kebijakan Anda benar demi kesehatan siswa.", weight: 2 },
-                    { text: "Menemui mereka, mendengarkan, lalu berjanji akan meninjau ulang kebijakan tersebut (untuk meredakan situasi).", weight: 3 },
-                    { text: "Mempersilakan perwakilan orang tua masuk, mendengarkan keluhan mereka dengan tenang, dan berjanji akan mencari solusi bersama.", weight: 4 },
-                    { text: "Mempersilakan perwakilan masuk, mendengarkan dengan empati, menyajikan data/alasan kebijakan, dan membuka forum dialog untuk mencari win-win solution (misal: kantin menyediakan menu sehat tapi praktis).", weight: 5 }
+                    "A. Membeli banyak buku baru untuk perpustakaan.",
+                    "B. Mewajibkan siswa membaca 15 menit setiap hari sebelum pelajaran (Gerakan Literasi Sekolah).",
+                    "C. Membentuk tim kecil (guru Bahasa, Pustakawan) untuk menganalisis data rapor lebih dalam, mencari akar masalah, dan merumuskan program intervensi.",
+                    "D. Menyalahkan guru Bahasa Indonesia karena dianggap gagal mengajar.",
+                    "E. Mengadakan lomba mading dan menulis cerpen untuk memotivasi siswa."
                 ],
-                rational_best: "Alasan (Skor 5): Menunjukkan empati, komunikasi asertif (menyajikan data), dan kolaborasi (mencari win-win solution). Ini mengubah konflik menjadi kemitraan.",
-                rational_worst: "Alasan (Skor 1): Menghindari konflik dan tidak menghargai orang tua sebagai mitra sekolah. Ini akan memperburuk masalah dan hubungan."
+                weights: { A: 3, B: 4, C: 5, D: 1, E: 2 }, // Kepemimpinan Pembelajaran (Berbasis Data)
+                rationale: "Rasional: (5) Analisis data untuk mencari akar masalah adalah langkah manajerial berbasis data (PDCA). (4) Mewajibkan membaca (B) adalah solusi, tapi mungkin tidak mengatasi akar masalah. (3) Membeli buku (A) tidak menjamin dibaca. (2) Lomba (E) bersifat insidental. (1) Menyalahkan (D) destruktif."
             },
             {
-                id: "q26",
-                component: "sosial",
-                question: "Terjadi konflik terbuka antara dua guru senior di ruang guru, yang mengganggu kenyamanan guru lain. Keduanya memiliki pendukung masing-masing. Langkah pertama Anda adalah...",
+                question: "Sekolah Anda mendapatkan dana BOS Kinerja, namun petunjuk teknis (Juknis) penggunaannya sangat rumit dan berpotensi salah tafsir. Bagaimana Anda mengelolanya?",
                 options: [
-                    { text: "Mengabaikannya, berharap masalah akan selesai dengan sendirinya.", weight: 1 },
-                    { text: "Menegur keduanya di depan guru-guru lain agar mereka malu dan berhenti.", weight: 2 },
-                    { text: "Membuat aturan baru di ruang guru tanpa mengatasi konflik intinya.", weight: 3 },
-                    { text: "Memanggil keduanya secara terpisah untuk mendengarkan masalah dari masing-masing pihak.", weight: 4 },
-                    { text: "Memanggil keduanya, pertama secara terpisah untuk empati, lalu bersama-sama untuk mediasi yang fokus pada solusi dan profesionalisme kerja.", weight: 5 }
+                    "A. Menggunakan dana tersebut sesuai interpretasi Anda sendiri, yang penting cepat terserap.",
+                    "B. Tidak menggunakan dana tersebut (mengembalikan ke kas negara) karena takut salah.",
+                    "C. Membentuk tim manajemen BOS, mempelajari Juknis bersama, dan aktif berkonsultasi dengan Dinas Pendidikan atau Tim BOS pusat sebelum membelanjakan.",
+                    "D. Mendelegasikan penuh kepada Bendahara BOS, Anda tinggal tanda tangan.",
+                    "E. Mengalokasikan dana untuk renovasi ruang kepala sekolah karena Juknisnya tidak jelas."
                 ],
-                rational_best: "Alasan (Skor 5): Ini adalah manajemen konflik yang lengkap. Mendengar secara terpisah (empati) dan mediasi bersama (solusi) adalah langkah yang sistematis untuk menyelesaikan akar masalah.",
-                rational_worst: "Alasan (Skor 1): Mengabaikan konflik adalah kepemimpinan yang absen (absentee leadership). Konflik di ruang guru akan meracuni budaya sekolah jika dibiarkan."
-            },
-            // Placeholder Sosial (q27 - q46)
-            ...Array.from({ length: 20 }, (_, i) => ({
-                id: `q${i + 27}`,
-                component: "sosial",
-                question: `[Soal Sosial ${i + 4}] Ada kesenjangan komunikasi antara sekolah dan komite sekolah. Komite merasa tidak dilibatkan dalam pengambilan keputusan. Apa langkah Anda untuk membangun kemitraan?`,
-                options: [
-                    { text: "Opsi E (Menghindar / Menyalahkan)", weight: 1 },
-                    { text: "Opsi D (Kurang Efektif)", weight: 2 },
-                    { text: "Opsi C (Reaktif / Formalitas)", weight: 3 },
-                    { text: "Opsi B (Komunikatif)", weight: 4 },
-                    { text: "Opsi A (Sangat Ideal / Kolaboratif & Empatik)", weight: 5 }
-                ],
-                rational_best: "Alasan (Skor 5): Jawaban ini (Opsi A) menunjukkan kemampuan membangun kemitraan yang proaktif, transparan, dan setara (kolaboratif).",
-                rational_worst: "Alasan (Skor 1): Jawaban ini (Opsi E) justru merusak hubungan sosial, menghindari tanggung jawab, dan menunjukkan komunikasi yang buruk."
-            })),
-
-            // === KOMPETENSI PROFESIONAL (24 Soal) ===
-            {
-                id: "q47",
-                component: "profesional",
-                question: "Data Rapor Pendidikan sekolah Anda menunjukkan hasil literasi siswa berada di bawah rata-rata nasional selama dua tahun berturut-turut. Langkah prioritas Anda adalah...",
-                options: [
-                    { text: "Meragukan validitas data Rapor Pendidikan dan meminta guru 'memperbaiki' data.", weight: 1 },
-                    { text: "Menyimpulkan ini adalah masalah 'minat baca' anak-anak zaman sekarang karena gadget.", weight: 2 },
-                    { text: "Mengirim semua guru Bahasa Indonesia untuk mengikuti pelatihan literasi terbaru.", weight: 3 },
-                    { text: "Segera mewajibkan program 'jam membaca' setiap hari sebelum kelas dimulai.", weight: 4 },
-                    { text: "Membentuk tim literasi, menganalisis data secara mendalam, mengidentifikasi akar masalah, dan menyusun program intervensi terfokus.", weight: 5 }
-                ],
-                rational_best: "Alasan (Skor 5): Ini adalah kepemimpinan profesional berbasis data. Tidak langsung melompat ke solusi, tetapi menganalisis akar masalah (PBD: Perencanaan Berbasis Data) terlebih dahulu.",
-                rational_worst: "Alasan (Skor 1): Ini adalah pelanggaran integritas data dan tidak profesional. Menolak data tanpa analisis menunjukkan ketidakmampuan manajerial."
+                weights: { A: 2, B: 1, C: 5, D: 3, E: 4 }, // Manajerial (Keuangan) & Akuntabilitas
+                rationale: "Rasional: (5) Kolaborasi (tim) dan konsultasi (ke atas) adalah kunci akuntabilitas. (4) Alokasi renov (E) mungkin melanggar Juknis. (3) Mendelegasikan penuh (D) adalah lepas tanggung jawab. (2) Menggunakan 'asal' (A) berisiko temuan. (1) Tidak menggunakan (B) merugikan sekolah."
             },
             {
-                id: "q48",
-                component: "profesional",
-                question: "Anda melakukan supervisi akademik dan menemukan seorang guru menggunakan metode mengajar yang sangat monoton dan tidak efektif (ceramah), padahal materi pelajarannya sangat penting. Respon Anda pasca-supervisi?",
+                question: "Banyak guru di sekolah Anda yang 'malas' mengikuti pelatihan (webinar) di PMM atau di luar sekolah, dengan alasan sibuk. Bagaimana Anda mendorong pengembangan profesionalisme mereka?",
                 options: [
-                    { text: "Langsung menegur guru tersebut di tempat karena metodenya salah.", weight: 1 },
-                    { text: "Memberikan nilai supervisi yang buruk tanpa memberikan umpan balik.", weight: 2 },
-                    { text: "Memberikan pujian atas 'upaya' guru, tapi tidak menyinggung masalah metode mengajar.", weight: 3 },
-                    { text: "Meminta guru tersebut untuk melihat cara mengajar guru lain yang lebih baik.", weight: 4 },
-                    { text: "Mengajak guru berdialog (coaching), menanyakan refleksi guru atas proses mengajarnya, dan bersama-sama mencari strategi baru yang lebih interaktif.", weight: 5 }
+                    "A. Mewajibkan setiap guru mengirimkan 3 sertifikat webinar setiap semester.",
+                    "B. Mengundang narasumber ahli ke sekolah (In-House Training/IHT) sesuai kebutuhan belajar guru yang dipetakan dari Rapor Pendidikan.",
+                    "C. Memberi sanksi potong tunjangan bagi guru yang tidak mau ikut pelatihan.",
+                    "D. Membiarkan saja, karena pengembangan diri adalah kesadaran masing-masing.",
+                    "E. Mengikutsertakan guru-guru muda saja yang dianggap masih mau belajar."
                 ],
-                rational_best: "Alasan (Skor 5): Ini adalah supervisi akademik modern (coaching). Tujuannya adalah memberdayakan guru melalui refleksi, bukan menghakimi. Ini menciptakan budaya belajar yang aman.",
-                rational_worst: "Alasan (Skor 1): Supervisi yang menghakimi di depan umum (atau bahkan saat proses mengajar) adalah tidak etis dan merusak mental guru serta proses belajar siswa."
+                weights: { A: 3, B: 5, C: 1, D: 2, E: 4 }, // Pengembangan SDM
+                rationale: "Rasional: (5) IHT berbasis kebutuhan (data) adalah solusi paling relevan dan efektif. (4) Hanya guru muda (E) diskriminatif. (3) Mewajibkan sertifikat (A) hanya mengejar administrasi, bukan substansi. (2) Membiarkan (D) adalah pembiaran. (1) Sanksi (C) bersifat demotivasi."
             },
             {
-                id: "q49",
-                component: "profesional",
-                question: "Anggaran sekolah (BOS) sangat terbatas, sementara ada banyak kebutuhan mendesak untuk perbaikan sarana dan program kesiswaan. Prioritas Anda dalam mengelola anggaran adalah...",
+                question: "Sekolah Anda ingin membuka jurusan/konsentrasi baru (misal: Desain Grafis), namun sarana (komputer) sangat terbatas. Apa langkah 'kewirausahaan' Anda?",
                 options: [
-                    { text: "Menggunakan anggaran untuk 'proyek' yang terlihat bagus dari luar, seperti mengecat gerbang.", weight: 1 },
-                    { text: "Membagi rata anggaran ke semua wakil kepala sekolah agar adil.", weight: 2 },
-                    { text: "Memfokuskan anggaran hanya pada perbaikan sarana fisik, mengabaikan program siswa.", weight: 3 },
-                    { text: "Menggunakan Rapor Pendidikan dan evaluasi diri sekolah (EDS) untuk menentukan program prioritas.", weight: 4 },
-                    { text: "Melakukan analisis kebutuhan prioritas berbasis data (Rapor Pendidikan/EDS), dan mengalokasikan anggaran terbesar pada program yang berdampak langsung pada peningkatan mutu pembelajaran.", weight: 5 }
+                    "A. Membatalkan rencana tersebut sampai ada bantuan DAK (Dana Alokasi Khusus) dari pemerintah.",
+                    "B. Mengajukan proposal kemitraan 'Link and Match' ke perusahaan desain lokal, menawarkan 'teaching factory' di mana siswa mengerjakan proyek riil perusahaan.",
+                    "C. Meminta siswa membawa laptop sendiri dari rumah (BYOD).",
+                    "D. Membeli komputer bekas dengan dana BOS reguler secara mencicil.",
+                    "E. Mengubah rencana menjadi jurusan 'Otomotif' yang peralatannya sudah ada."
                 ],
-                rational_best: "Alasan (Skor 5): Ini adalah manajemen anggaran berbasis prioritas (PBD). Fokusnya adalah pada dampak (mutu pembelajaran), bukan sekadar 'terlihat' bagus atau 'adil' dibagi rata.",
-                rational_worst: "Alasan (Skor 1): Ini adalah manajemen yang buruk, fokus pada kosmetik (penampilan) bukan substansi (pembelajaran), dan membuang anggaran yang terbatas."
+                weights: { A: 2, B: 5, C: 4, D: 3, E: 1 }, // Kewirausahaan & Jejaring
+                rationale: "Rasional: (5) Kemitraan (B) adalah inti kewirausahaan, mencari solusi win-win tanpa bergantung pada dana pemerintah. (4) BYOD (C) solusi, tapi memberatkan siswa. (3) Beli bekas (D) solusi, tapi kurang inovatif. (2) Menunggu (A) adalah pasif. (1) Mengubah rencana (E) adalah menyerah."
             },
-            // Placeholder Profesional (q50 - q70)
-            ...Array.from({ length: 21 }, (_, i) => ({ // (70 - 49) + 1 = 21
-                id: `q${i + 50}`,
-                component: "profesional",
-                question: `[Soal Profesional ${i + 4}] Kurikulum Merdeka menuntut pembelajaran berdiferensiasi. Namun, banyak guru masih bingung dalam implementasinya. Apa langkah manajerial Anda?`,
+            {
+                question: "Bagaimana cara Anda yang paling efektif dalam menyusun Rencana Kerja Jangka Menengah (RKJM) sekolah?",
                 options: [
-                    { text: "Opsi E (Tidak Relevan / Pasif)", weight: 1 },
-                    { text: "Opsi D (Instruktif / Satu Arah)", weight: 2 },
-                    { text: "Opsi C (Standar / Pelatihan Formal)", weight: 3 },
-                    { text: "Opsi B (Fasilitatif / Komunitas Belajar)", weight: 4 },
-                    { text: "Opsi A (Sangat Ideal / Berbasis Data & Berkelanjutan)", weight: 5 }
+                    "A. Menyusunnya sendiri di ruang kerja Anda agar lebih fokus dan cepat selesai.",
+                    "B. Menyalin (copy-paste) RKJM dari sekolah lain yang sudah terakreditasi A.",
+                    "C. Membentuk Tim Pengembang Sekolah (TPS) yang melibatkan guru, komite, dan perwakilan siswa, berdasarkan analisis SWOT dan Rapor Pendidikan.",
+                    "D. Membayar konsultan pendidikan untuk membuatkan RKJM yang bagus.",
+                    "E. Menggunakan RKJM tahun-tahun sebelumnya, hanya mengganti tanggalnya."
                 ],
-                rational_best: "Alasan (Skor 5): Jawaban ini (Opsi A) menunjukkan kepemimpinan pembelajaran (instructional leadership) yang sistematis, berbasis data, dan berkelanjutan (menciptakan komunitas belajar).",
-                rational_worst: "Alasan (Skor 1): Jawaban ini (Opsi E) menunjukkan kegagalan dalam peran utama kepala sekolah sebagai pemimpin pembelajaran."
-            }))
+                weights: { A: 2, B: 3, C: 5, D: 4, E: 1 }, // Manajerial (Perencanaan)
+                rationale: "Rasional: (5) Perencanaan partisipatif (melibatkan TPS) dan berbasis data (SWOT, Rapor) adalah yang paling ideal. (4) Konsultan (D) mungkin bagus, tapi tidak partisipatif. (3) Menyalin (B) tidak sesuai konteks. (2) Menyusun sendiri (A) 'top-down'. (1) Mengganti tanggal (E) tidak ada perbaikan."
+            },
+            {
+                question: "Seorang guru menolak menggunakan sistem penilaian (e-Rapor) yang baru karena 'gaptek' dan merasa lebih nyaman manual. Padahal ini kebijakan wajib. Apa tindakan Anda?",
+                options: [
+                    "A. Memaklumi dan mengizinkannya tetap manual, yang penting nilai masuk.",
+                    "B. Memintanya untuk belajar sendiri di YouTube.",
+                    "C. Memberinya pendampingan teknis (misal: oleh guru TIK atau operator) sampai bisa, dan menjelaskan pentingnya integrasi data.",
+                    "D. Mengancam akan melaporkannya ke pengawas jika tidak mau patuh.",
+                    "E. Mengerjakan e-Rapor guru tersebut agar cepat selesai."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 1, E: 4 }, // Pengembangan SDM & Manajerial
+                rationale: "Rasional: (5) Memberi pendampingan teknis (solusi) dan menjelaskan 'mengapa' (visi) adalah kepemimpinan profesional. (4) Mengerjakannya (E) tidak mendidik. (3) Memintanya belajar sendiri (B) kurang suportif. (2) Memaklumi (A) melanggar aturan. (1) Mengancam (D) destruktif."
+            },
+            {
+                question: "Hasil supervisi Anda menunjukkan bahwa 80% guru masih belum menerapkan unsur 'Higher Order Thinking Skills' (HOTS) dalam pembelajaran. Apa tindak lanjut Anda?",
+                options: [
+                    "A. Mengadakan IHT tentang 'Konsep HOTS' dengan mengundang narasumber dari universitas.",
+                    "B. Membuat program 'Lesson Study' atau Komunitas Belajar (Kombel) antar guru untuk bersama-sama merancang, mempraktikkan, dan merefleksikan RPP berbasis HOTS.",
+                    "C. Menegur semua guru di rapat dinas karena gagal menerapkan kurikulum.",
+                    "D. Membuat surat edaran yang mewajibkan soal ujian harus 50% HOTS.",
+                    "E. Menganggap wajar karena HOTS memang sulit diterapkan."
+                ],
+                weights: { A: 4, B: 5, C: 1, D: 3, E: 2 }, // Kepemimpinan Pembelajaran
+                rationale: "Rasional: (5) Lesson Study/Kombel (B) adalah pengembangan profesional berkelanjutan (job-embedded) dan kolaboratif, lebih efektif daripada IHT satu arah. (4) IHT (A) baik, tapi seringkali teoritis. (3) Surat edaran (D) adalah instruksi tanpa pembinaan. (2) Menganggap wajar (E) pasif. (1) Menegur (C) demotivasi."
+            },
+            {
+                question: "Kantin sekolah dikelola secara tradisional dan terlihat kurang higienis. Anda ingin memperbaikinya. Langkah manajerial apa yang Anda lakukan?",
+                options: [
+                    "A. Menutup kantin dan melarang siswa jajan di sekolah.",
+                    "B. Memarahi penjaga kantin karena tidak bersih.",
+                    "C. Mengambil alih pengelolaan kantin oleh koperasi sekolah, atau membuat tender ulang dengan SOP kebersihan yang ketat, serta melibatkan BPOM/Dinkes untuk penyuluhan.",
+                    "D. Membangun gedung kantin baru yang mewah.",
+                    "E. Menempel poster 'Cara Hidup Sehat' di dinding kantin."
+                ],
+                weights: { A: 1, B: 2, C: 5, D: 3, E: 4 }, // Manajerial & Kewirausahaan
+                rationale: "Rasional: (5) Memperbaiki sistem (SOP, tender) dan melibatkan ahli (Dinkes) adalah solusi manajerial profesional. (4) Poster (E) hanya himbauan. (3) Gedung baru (D) tidak menjamin kebersihan. (2) Memarahi (B) tidak sistemik. (1) Menutup (A) tidak solutif."
+            },
+            {
+                question: "Visi sekolah yang lama Anda rasakan sudah tidak relevan dengan tuntutan zaman (misal: 'Bertaqwa dan Berbudi Pekerti Luhur'). Apa yang Anda lakukan?",
+                options: [
+                    "A. Mengganti visi itu sendiri dengan visi baru yang lebih modern (misal: 'Berprofil Pelajar Pancasila dan Berdaya Saing Global').",
+                    "B. Membiarkan visi lama, yang penting program sekolah berjalan.",
+                    "C. Melakukan evaluasi visi jangka panjang bersama tim pengembang sekolah, komite, dan yayasan (jika swasta), lalu merumuskan ulang visi baru secara partisipatif.",
+                    "D. Tetap menggunakan visi lama, namun 'menerjemahkannya' dalam program-program yang lebih modern.",
+                    "E. Mengadakan lomba membuat visi baru untuk siswa."
+                ],
+                weights: { A: 3, B: 1, C: 5, D: 4, E: 2 }, // Kepemimpinan Visi
+                rationale: "Rasional: (5) Visi harus dirumuskan ulang secara partisipatif, tidak bisa diubah sepihak oleh KS. (4) Menerjemahkan (D) adalah solusi jangka pendek yang baik jika (5) belum mungkin. (3) Mengganti sendiri (A) 'top-down'. (2) Lomba (E) tidak tepat. (1) Membiarkan (B) pasif."
+            },
+            {
+                question: "Seorang guru TIK yang sangat Anda andalkan, mengeluhkan sarana komputer yang lambat sehingga menghambat praktik siswa. Dana BOS tidak cukup. Apa solusi kreatif Anda?",
+                options: [
+                    "A. Memintanya bersabar sampai ada bantuan pemerintah.",
+                    "B. Mengajukan proposal 'Corporate Social Responsibility' (CSR) ke perusahaan teknologi/bank di sekitar sekolah untuk pengadaan komputer.",
+                    "C. Mengurangi jam praktik TIK dan memperbanyak jam teori.",
+                    "D. Meminta guru TIK tersebut mencari pinjaman komputer dari sekolah lain.",
+                    "E. Menggunakan dana pribadi Anda untuk meng-upgrade beberapa unit."
+                ],
+                weights: { A: 2, B: 5, C: 3, D: 1, E: 4 }, // Kewirausahaan & Jejaring
+                rationale: "Rasional: (5) Mengajukan CSR (B) adalah langkah kewirausahaan proaktif. (4) Dana pribadi (E) baik tapi tidak berkelanjutan. (3) Mengurangi praktik (C) merugikan siswa. (2) Bersabar (A) pasif. (1) Meminta pinjam (D) tidak profesional."
+            },
+            {
+                question: "Dalam rapat kenaikan kelas, terjadi perdebatan alot tentang seorang siswa yang nilainya 'di batas' (KKM) dan sikapnya kurang baik. Sebagian guru ingin menaikkan, sebagian ingin meninggalkan. Bagaimana Anda mengambil keputusan?",
+                options: [
+                    "A. Melakukan voting di antara guru untuk mengambil keputusan.",
+                    "B. Menyerahkan keputusan sepenuhnya kepada wali kelas.",
+                    "C. Menunda keputusan dan meminta guru BK dan wali kelas melakukan home visit terlebih dahulu.",
+                    "D. Meminta semua data (akademik, absensi, catatan sikap), mendengarkan semua argumen, dan mengambil keputusan akhir (sebagai 'hak prerogatif' KS) berdasarkan pertimbangan yang paling mendidik bagi siswa.",
+                    "E. Pasti menaikkan siswa, karena angka tinggal kelas yang tinggi berdampak buruk pada rapor sekolah."
+                ],
+                weights: { A: 3, B: 2, C: 4, D: 5, E: 1 }, // Pengambilan Keputusan & Kepemimpinan Pembelajaran
+                rationale: "Rasional: (5) KS adalah pengambil keputusan akhir (D) berdasarkan data dan pertimbangan pedagogik, bukan popularitas (voting). (4) Home visit (C) baik, tapi keputusan tetap harus diambil di rapat. (3) Voting (A) bisa jadi tidak adil. (2) Menyerahkan ke wali kelas (B) lempar tanggung jawab. (1) Poin E mengorbankan pembinaan."
+            },
+            {
+                question: "Sekolah Anda tidak memiliki sistem inventaris barang (aset) yang jelas. Barang sering hilang atau rusak tidak terdata. Apa langkah manajerial Anda?",
+                options: [
+                    "A. Menugaskan wakil sarpras untuk 'mencatat' semua barang yang ada di buku tulis.",
+                    "B. Membeli aplikasi manajemen aset yang mahal agar terlihat profesional.",
+                    "C. Membentuk tim aset, melakukan stok opname total, dan menerapkan sistem pelabelan (barcode/QR code sederhana) menggunakan aplikasi gratis (misal: Google Sheet) yang terintegrasi.",
+                    "D. Mengganti semua kunci gudang dan hanya Anda yang boleh memegangnya.",
+                    "E. Menyalahkan penjaga sekolah karena tidak becus menjaga barang."
+                ],
+                weights: { A: 3, B: 4, C: 5, D: 2, E: 1 }, // Manajerial (Sarpras)
+                rationale: "Rasional: (5) Stok opname dan membangun sistem (C) adalah solusi manajerial yang tepat. (4) Membeli aplikasi mahal (B) belum tentu efektif jika sistemnya tidak dibangun. (3) Mencatat di buku (A) tidak digital. (2) Mengganti kunci (D) tidak sistemik. (1) Menyalahkan (E) destruktif."
+            },
+            {
+                question: "Guru-guru mengeluhkan banyaknya tugas administrasi (RPP, laporan, dll) yang tumpang tindih dan menyita waktu mengajar. Apa respons Anda?",
+                options: [
+                    "A. Mengatakan bahwa itu sudah menjadi tugas dan kewajiban seorang guru.",
+                    "B. Mencari tahu administrasi mana yang 'wajib' (dari dinas) dan mana yang 'buatan sekolah', lalu menyederhanakan/mengintegrasikan format laporan sekolah.",
+                    "C. Menghapus semua tugas administrasi agar guru fokus mengajar.",
+                    "D. Menambah staf TU untuk mengerjakan administrasi guru.",
+                    "E. Memberi pelatihan 'Manajemen Waktu' untuk guru."
+                ],
+                weights: { A: 3, B: 5, C: 1, D: 4, E: 2 }, // Manajerial & Kepemimpinan Pembelajaran
+                rationale: "Rasional: (5) Menyederhanakan birokrasi internal (B) adalah solusi manajerial yang berpihak pada pembelajaran. (4) Menambah staf (D) solusi, tapi (5) lebih ke akar masalah. (3) Poin A 'saklek'. (2) Pelatihan (E) tidak menyelesaikan masalah jika bebannya memang berat. (1) Menghapus semua (C) tidak mungkin."
+            },
+            {
+                question: "Program 'Teaching Factory' (TEFA) di SMK Anda berjalan, namun produk yang dihasilkan tidak laku atau tidak standar industri. Apa evaluasi Anda?",
+                options: [
+                    "A. Menghentikan program TEFA karena merugi.",
+                    "B. Tetap memproduksi, yang penting siswa belajar membuat produk.",
+                    "C. Melakukan studi banding ke SMK lain yang TEFA-nya berhasil.",
+                    "D. Menurunkan standar kualitas produk agar lebih mudah dibuat siswa.",
+                    "E. Mengundang praktisi industri untuk menjadi 'quality control' dan 'mentor' bagi guru/siswa dalam proses produksi.",
+                ],
+                weights: { A: 1, B: 3, C: 4, D: 2, E: 5 }, // Kewirausahaan & Kepemimpinan Pembelajaran (SMK)
+                rationale: "Rasional: (5) Melibatkan praktisi (E) adalah inti dari 'Link and Match' untuk menjaga standar industri. (4) Studi banding (C) baik, tapi (5) adalah aksi langsung. (3) Tetap produksi (B) mengabaikan kualitas. (2) Menurunkan standar (D) mencederai tujuan. (1) Menghentikan (A) adalah menyerah."
+            },
+            {
+                question: "Seorang guru baru yang sangat potensial (CPNS/P3K) terlihat kesulitan mengelola kelas (siswa ramai). Apa yang Anda lakukan?",
+                options: [
+                    "A. Membiarkannya, agar ia belajar mandiri 'ditempa' oleh keadaan.",
+                    "B. Menegurnya karena dianggap gagal, padahal sudah lolos seleksi.",
+                    "C. Memintanya untuk 'observasi' saja ke kelas guru senior selama 1 semester.",
+                    "D. Menerapkan program 'mentoring' formal, menugaskan guru senior yang suportif untuk membimbingnya dan melakukan observasi sejawat.",
+                    "E. Memindahkannya ke kelas yang siswanya 'tidak terlalu ramai'."
+                ],
+                weights: { A: 2, B: 1, C: 3, D: 5, E: 4 }, // Pengembangan SDM
+                rationale: "Rasional: (5) Program mentoring (D) adalah sistem pembinaan profesional yang paling efektif untuk guru baru. (4) Memindahkan kelas (E) solusi sementara. (3) Observasi saja (C) pasif. (2) Membiarkan (A) bisa membuatnya 'burnout'. (1) Menegur (B) demotivasi."
+            },
+            {
+                question: "Dana BOS Reguler terlambat cair dari pusat, sementara sekolah harus membayar tagihan listrik dan internet yang akan jatuh tempo. Apa keputusan manajerial Anda?",
+                options: [
+                    "A. Membiarkan listrik dan internet diputus sampai dana cair.",
+                    "B. Meminta guru-guru untuk 'patungan' menalangi tagihan tersebut.",
+                    "C. Menggunakan dana pribadi Anda untuk menalangi tagihan tersebut.",
+                    "D. Meminjam uang dari Koperasi Sekolah atau 'dana talangan' lain yang prosedurnya jelas, untuk dibayar kembali saat BOS cair.",
+                    "E. Menyalahkan pemerintah pusat atas keterlambatan ini."
+                ],
+                weights: { A: 1, B: 2, C: 4, D: 5, E: 3 }, // Manajerial (Keuangan)
+                rationale: "Rasional: (5) Mencari dana talangan resmi (D) adalah solusi manajerial yang akuntabel. (4) Dana pribadi (C) mulia, tapi tidak profesional (sebaiknya dihindari). (3) Menyalahkan (E) tidak solutif. (2) Meminta patungan guru (B) tidak etis. (1) Membiarkan diputus (A) mengganggu layanan."
+            },
+            {
+                question: "Anda ingin membudayakan 'Refleksi Pembelajaran' di kalangan guru, namun guru-guru merasa itu 'hanya buang waktu'. Bagaimana Anda memulainya?",
+                options: [
+                    "A. Mewajibkan guru mengisi jurnal refleksi harian dan dikumpulkan ke Anda.",
+                    "B. Memberi contoh terlebih dahulu, dengan Anda melakukan refleksi terbuka atas kepemimpinan Anda di rapat guru.",
+                    "C. Menjelaskan teori refleksi (Schon, Gibbs) dalam rapat dinas.",
+                    "D. Membatalkan program karena guru tidak antusias.",
+                    "E. Mengundang motivator untuk membangkitkan semangat guru."
+                ],
+                weights: { A: 3, B: 5, C: 2, D: 1, E: 4 }, // Kepemimpinan Pembelajaran & Pengembangan Diri
+                rationale: "Rasional: (5) Memberi contoh (B) adalah 'Lead by Example', cara paling kuat untuk membangun budaya. (4) Motivator (E) hanya sementara. (3) Mewajibkan jurnal (A) bersifat administratif. (2) Menjelaskan teori (C) tidak aplikatif. (1) Membatalkan (D) adalah menyerah."
+            },
+            {
+                question: "Saat melakukan supervisi administrasi, Anda menemukan RPP seorang guru 'copy-paste' total dari internet (termasuk nama sekolah lain). Apa respons profesional Anda?",
+                options: [
+                    "A. Menyindir guru tersebut di grup WA guru.",
+                    "B. Langsung memberi nilai C/D pada instrumen supervisi administrasinya.",
+                    "C. Memanggilnya secara pribadi, menunjukkan temuan, menanyakan alasan, dan meminta komitmen perbaikan RPP yang sesuai konteks kelasnya.",
+                    "D. Menggeledah file guru-guru lain untuk mencari siapa lagi yang 'copy-paste'.",
+                    "E. Tidak mempermasalahkan, yang penting guru tersebut sudah mengumpulkan RPP."
+                ],
+                weights: { A: 1, B: 4, C: 5, D: 2, E: 3 }, // Supervisi & Kepemimpinan Pembelajaran
+                rationale: "Rasional: (5) Klarifikasi pribadi dan meminta komitmen perbaikan (C) adalah langkah pembinaan. (4) Memberi nilai buruk (B) adalah 'judging', tapi (5) lebih reflektif. (3) Tidak mempermasalahkan (E) adalah pembiaran. (2) Menggeledah (D) tidak perlu. (1) Menyindir (A) tidak etis."
+            },
+            {
+                question: "Lahan parkir sekolah sangat sempit dan sering memicu konflik (guru berebut tempat, siswa parkir sembarangan). Apa solusi manajerial Anda?",
+                options: [
+                    "A. Menetapkan bahwa parkir hanya untuk Kepala Sekolah dan Wakil.",
+                    "B. Membuat aturan 'Siapa Cepat Dia Dapat'.",
+                    "C. Menganalisis kebutuhan, menata ulang area (layout), dan mungkin memberlakukan 'Car Free Day' internal atau zona parkir bergiliran.",
+                    "D. Menyewa lahan warga di sebelah sekolah untuk parkir.",
+                    "E. Melarang semua guru dan siswa membawa kendaraan pribadi."
+                ],
+                weights: { A: 1, B: 2, C: 5, D: 4, E: 3 }, // Manajerial (Sarpras)
+                rationale: "Rasional: (5) Analisis kebutuhan dan menata ulang (C) adalah solusi manajerial sistemik. (4) Menyewa lahan (D) solusi, tapi membebani anggaran. (3) Melarang total (E) tidak realistis. (2) Siapa cepat (B) memicu konflik. (1) Hanya pimpinan (A) tidak adil."
+            },
+            {
+                question: "Sekolah Anda (SD) memiliki beberapa guru yang sangat 'sayang' pada siswanya, sehingga nilai rapor 'dibuat' bagus semua (KKM semua). Bagaimana Anda menyikapi hal ini?",
+                options: [
+                    "A. Membiarkan, karena itu bentuk kasih sayang guru dan membuat orang tua senang.",
+                    "B. Menegur guru tersebut karena melakukan 'kebohongan publik' atas data nilai.",
+                    "C. Mengadakan lokakarya tentang 'Prinsip Asesmen yang Objektif' dan menunjukkan dampak negatif dari nilai 'belas kasihan' bagi siswa.",
+                    "D. Mewajibkan semua ujian dibuat dan diperiksa terpusat oleh Anda.",
+                    "E. Memuji guru tersebut karena berhasil membuat nilai siswanya bagus."
+                ],
+                weights: { A: 2, B: 4, C: 5, D: 3, E: 1 }, // Kepemimpinan Pembelajaran (Asesmen)
+                rationale: "Rasional: (5) Meluruskan 'mindset' melalui lokakarya (C) adalah pembinaan profesional. (4) Menegur (B) benar, tapi (5) lebih solutif. (3) Ujian terpusat (D) merepotkan. (2) Membiarkan (A) merusak objektivitas. (1) Memuji (E) adalah kesalahan fatal."
+            },
+            {
+                question: "Anda ingin membuat 'pojok baca' di setiap kelas, namun dana tidak ada. Apa langkah 'kewirausahaan' Anda?",
+                options: [
+                    "A. Menunggu sisa dana BOS di akhir tahun.",
+                    "B. Menginstruksikan guru kelas untuk menghias kelas dengan uang pribadi mereka.",
+                    "C. Membuat program 'Gerakan 1 Siswa 1 Buku', di mana siswa menyumbang satu buku (bekas layak baca) untuk pojok baca kelasnya masing-masing.",
+                    "D. Membatalkan program karena tidak ada dana.",
+                    "E. Mengambil buku-buku dari perpustakaan pusat untuk dibagikan ke kelas."
+                ],
+                weights: { A: 3, B: 1, C: 5, D: 2, E: 4 }, // Kewirausahaan & Kepemimpinan Pembelajaran
+                rationale: "Rasional: (5) Program partisipatif (C) adalah solusi kewirausahaan sosial yang tidak membebani anggaran. (4) Mengambil dari perpus (E) mengurangi koleksi pusat. (3) Menunggu (A) pasif. (2) Batal (D) menyerah. (1) Uang pribadi guru (B) tidak adil."
+            },
+            {
+                question: "Seorang guru wakil kepala sekolah (Wakasek) yang Anda tunjuk, bekerja sangat lambat dan tidak terorganisir, sehingga menghambat program sekolah. Apa tindakan Anda?",
+                options: [
+                    "A. Langsung menggantinya dengan guru lain yang lebih cekatan.",
+                    "B. Mengambil alih semua tugasnya agar cepat selesai.",
+                    "C. Memberikan 'coaching' tentang manajemen waktu dan prioritas, serta membuat 'checklist' pekerjaan mingguan yang harus dilaporkan.",
+                    "D. Memarahinya di rapat karena kinerjanya buruk.",
+                    "E. Mengurangi beban tugasnya agar dia tidak stres."
+                ],
+                weights: { A: 2, B: 3, C: 5, D: 1, E: 4 }, // Pengembangan SDM (Coaching)
+                rationale: "Rasional: (5) Coaching dan membuat sistem monitoring (C) adalah pembinaan kinerja. (4) Mengurangi beban (E) tidak menyelesaikan masalah. (3) Mengambil alih (B) tidak mendidik. (2) Langsung mengganti (A) otoriter. (1) Memarahi (D) destruktif."
+            },
+            {
+                question: "Sekolah Anda mendapatkan bantuan TIK (misal: Chromebook) dalam jumlah besar. Namun, banyak guru belum terbiasa menggunakannya dalam pembelajaran. Apa langkah manajerial Anda untuk memastikan alat ini digunakan secara efektif?",
+                options: [
+                    "A. Menyimpan Chromebook di gudang agar aman dan awet, menunggu guru siap.",
+                    "B. Mewajibkan guru memakai Chromebook di setiap pelajaran, dan memberi sanksi jika tidak.",
+                    "C. Menjual sebagian Chromebook untuk membiayai pelatihan guru.",
+                    "D. Membuat jadwal pelatihan TIK (IHT), membentuk komunitas belajar guru, dan meminta guru merancang RPP yang mengintegrasikan Chromebook.",
+                    "E. Menugaskan guru TIK saja untuk menggunakan semua Chromebook tersebut di lab komputer."
+                ],
+                weights: { A: 1, B: 3, C: 2, D: 5, E: 4 }, // Manajerial & Pengembangan SDM
+                rationale: "Rasional: (5) Pelatihan terstruktur, komunitas belajar, dan integrasi RPP (D) adalah cara profesional memastikan pemanfaatan aset. (4) Menugaskan guru TIK (E) baik, tapi tidak memberdayakan semua guru. (3) Mewajibkan (B) tanpa dukungan tidak efektif. (2) Menjual (C) adalah salah prosedur/ilegal. (1) Menyimpan (A) adalah kegagalan manajerial."
+            }
         ];
+
 
         let currentQuestionIndex = 0;
-        let currentPartIndex = 0; // 0: Kepribadian, 1: Sosial, 2: Profesional
-        const userAnswers = {};
-        const allScores = {
-            kepribadian: 0,
-            sosial: 0,
-            profesional: 0,
-            total: 0
-        };
+        const userAnswers = new Array(questions.length).fill(null);
 
-        const partBoundaries = [
-            { name: "Kepribadian", start: 0, end: 22, count: 23, maxScore: 23 * 5 },
-            { name: "Sosial", start: 23, end: 45, count: 23, maxScore: 23 * 5 },
-            { name: "Profesional", start: 46, end: 69, count: 24, maxScore: 24 * 5 }
-        ];
-
-        const maxScores = {
-            kepribadian: 23 * 5,
-            sosial: 23 * 5,
-            profesional: 24 * 5,
-            total: (23 * 5) + (23 * 5) + (24 * 5)
-        };
-
-        const questionsWrapper = document.getElementById('questions-wrapper');
-        const progressText = document.getElementById('progress-text');
-        const progressBar = document.getElementById('progress-bar');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const finishPartBtn = document.getElementById('finish-part-btn');
-        const finishQuizBtn = document.getElementById('finish-quiz-btn');
-        const quizContainer = document.getElementById('quiz-container');
-        const componentTitle = document.getElementById('component-title'); // Variabel baru
-
-        // Kontainer Hasil Parsial
-        const partialResultsContainer = document.getElementById('partial-results-container');
-        const partialComponentName = document.getElementById('partial-component-name');
-        const partialScore = document.getElementById('partial-score');
-        const nextPartBtn = document.getElementById('next-part-btn');
-        
-        // Kontainer Hasil Final
-        const finalResultsContainer = document.getElementById('final-results-container');
-        const quizForm = document.getElementById('quiz-form');
-        const finalRestartBtn = document.getElementById('final-restart-btn');
-        const printReviewBtn = document.getElementById('print-review-btn'); // Tombol baru
-
-        function initializeQuiz() {
-            questionsWrapper.innerHTML = ''; // Kosongkan wrapper
-            questions.forEach((q, index) => {
-                const questionBlock = document.createElement('div');
-                questionBlock.id = `question-${q.id}`;
-                questionBlock.className = 'question-block';
-                if (index === 0) {
-                    questionBlock.classList.add('active'); // Tampilkan soal pertama
-                }
-
-                let optionsHTML = q.options
-                    .sort(() => Math.random() - 0.5) // Acak urutan pilihan jawaban
-                    .map((opt, i) => `
-                    <div class="option-wrapper">
-                        <input type="radio" id="opt-${q.id}-${i}" name="${q.id}" value="${opt.weight}" class="hidden" required>
-                        <label for="opt-${q.id}-${i}" class="block w-full p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200 text-gray-700">
-                            ${opt.text}
-                        </label>
-                    </div>
-                `).join('');
-
-                questionBlock.innerHTML = `
-                    <p class="text-lg md:text-xl font-medium mb-6 leading-relaxed">${index + 1}. ${q.question}</p>
-                    <div class="options-container space-y-4">
-                        ${optionsHTML}
-                    </div>
-                `;
-                questionsWrapper.appendChild(questionBlock);
-            });
-
-            // Tambahkan event listener ke radio button yang baru dibuat
-            document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    const qId = e.target.name;
-                    const weight = parseInt(e.target.value);
-                    userAnswers[qId] = weight;
-                    
-                    // Otomatis pindah ke soal berikutnya jika bukan soal terakhir
-                    setTimeout(() => {
-                        const currentPart = partBoundaries[currentPartIndex];
-                        if (currentQuestionIndex < currentPart.end) {
-                            nextQuestion();
-                        }
-                        // Jika ini soal terakhir di bagian itu, jangan auto-next.
-                        // Biarkan pengguna menekan tombol "Selesai Bagian Ini".
-                    }, 300); // Tunda sedikit
-                });
-            });
-        }
-
-        function displayQuestion(index) {
-            // Perbarui judul kompetensi
-            componentTitle.textContent = "Kompetensi " + partBoundaries[currentPartIndex].name;
-
-            document.querySelectorAll('.question-block').forEach((block, i) => {
-                block.classList.toggle('active', i === index);
-            });
-            updateProgress(index);
-            updateNavigation(index);
-        }
-
-        function updateProgress(index) {
-            const questionNum = index + 1;
-            const percentage = (questionNum / questions.length) * 100;
-            progressText.textContent = `Soal ${questionNum} dari ${questions.length}`;
-            progressBar.style.width = `${percentage}%`;
-        }
-
-        function updateNavigation(index) {
-            const currentPart = partBoundaries[currentPartIndex];
-            const isEndOfPart = (index === currentPart.end);
-            const isEndOfQuiz = (index === questions.length - 1);
-
-            // Nonaktifkan tombol 'sebelumnya' di awal setiap bagian
-            prevBtn.disabled = (index === 0 || index === partBoundaries[1].start || index === partBoundaries[2].start);
-            
-            nextBtn.classList.toggle('hidden', isEndOfPart || isEndOfQuiz);
-            finishPartBtn.classList.toggle('hidden', !isEndOfPart || isEndOfQuiz); // Tampil di akhir bagian, KECUALI akhir kuis
-            finishQuizBtn.classList.toggle('hidden', !isEndOfQuiz); // Tampil HANYA di akhir kuis
-        }
-
-        function nextQuestion() {
-            // Cek apakah soal saat ini sudah dijawab
-            const currentQuestionId = questions[currentQuestionIndex].id;
-            if (userAnswers[currentQuestionId] === undefined) {
-                // Tampilkan pesan error (opsional)
-                // alert("Harap pilih salah satu jawaban.");
-                // Untuk SJT, kita izinkan lanjut
-            }
-            
-            if (currentQuestionIndex < questions.length - 1) {
-                // Pastikan tidak melompat ke bagian berikutnya
-                const currentPart = partBoundaries[currentPartIndex];
-                if(currentQuestionIndex + 1 <= currentPart.end) {
-                    currentQuestionIndex++;
-                    displayQuestion(currentQuestionIndex);
-                }
-            }
-        }
-
-        function prevQuestion() {
-            // Pastikan tidak mundur ke bagian sebelumnya
-            const currentPart = partBoundaries[currentPartIndex];
-            if (currentQuestionIndex > currentPart.start) {
-                currentQuestionIndex--;
-                displayQuestion(currentQuestionIndex);
-            }
-        }
-
-        function showPartialResults() {
-            const currentPart = partBoundaries[currentPartIndex];
-            let partScore = 0;
-            for (let i = currentPart.start; i <= currentPart.end; i++) {
-                const qId = questions[i].id;
-                partScore += (userAnswers[qId] || 0);
-            }
-
-            // Simpan skor
-            if (currentPart.name === "Kepribadian") allScores.kepribadian = partScore;
-            if (currentPart.name === "Sosial") allScores.sosial = partScore;
-            
-            // Tampilkan
-            partialComponentName.textContent = currentPart.name;
-            partialScore.textContent = `${partScore} / ${currentPart.maxScore}`;
-
-            quizContainer.classList.add('hidden');
-            partialResultsContainer.classList.remove('hidden');
-            window.scrollTo(0, 0);
-        }
-
-        function startNextPart() {
-            currentPartIndex++;
-            const newPart = partBoundaries[currentPartIndex];
-            currentQuestionIndex = newPart.start;
-            
-            partialResultsContainer.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            
-            displayQuestion(currentQuestionIndex);
-        }
-
-        function calculateFinalResults(e) {
-            e.preventDefault();
-
-            // Cek apakah semua soal sudah dijawab (opsional, untuk SJT mungkin tidak wajib)
-            
-            // 1. Hitung skor untuk bagian terakhir (Profesional)
-            const lastPart = partBoundaries[currentPartIndex]; // Harusnya Profesional
-            let lastPartScore = 0;
-            for (let i = lastPart.start; i <= lastPart.end; i++) {
-                const qId = questions[i].id;
-                lastPartScore += (userAnswers[qId] || 0);
-            }
-            allScores.profesional = lastPartScore;
-
-            // 2. Hitung total
-            allScores.total = allScores.kepribadian + allScores.sosial + allScores.profesional;
-
-            // 3. Tampilkan hasil
-            document.getElementById('kepribadian-score').textContent = `${allScores.kepribadian} / ${partBoundaries[0].maxScore}`;
-            document.getElementById('sosial-score').textContent = `${allScores.sosial} / ${partBoundaries[1].maxScore}`;
-            document.getElementById('profesional-score').textContent = `${allScores.profesional} / ${partBoundaries[2].maxScore}`;
-            document.getElementById('total-score').textContent = `${allScores.total} / ${maxScores.total}`;
-
-            quizContainer.classList.add('hidden');
-            finalResultsContainer.classList.remove('hidden');
-            window.scrollTo(0, 0); // Scroll ke atas
-
-            // Tampilkan kunci jawaban setelah hasil akhir muncul
-            displayAnswerKey();
-        }
-
-        function displayAnswerKey() {
-            const answerKeyList = document.getElementById('answer-key-list');
-            answerKeyList.innerHTML = ''; // Kosongkan daftar sebelumnya
-
-            questions.forEach((q, index) => {
-                const userWeight = userAnswers[q.id] || 0;
-                let userAnswerText = "<i>Tidak dijawab</i>";
-                let bestAnswerText = "";
-                let worstAnswerText = ""; // BARU: Teks jawaban terburuk
-                let isBestAnswer = false;
-
-                // Cari teks jawaban user, jawaban terbaik (skor 5), dan jawaban terburuk (skor 1)
-                for (const opt of q.options) {
-                    if (opt.weight === 5) {
-                        bestAnswerText = opt.text;
-                    }
-                    if (opt.weight === 1) { // BARU
-                        worstAnswerText = opt.text;
-                    }
-                    if (opt.weight === userWeight) {
-                        userAnswerText = opt.text;
-                    }
-                }
-                
-                if (userWeight === 5) {
-                    isBestAnswer = true;
-                }
-
-                // Buat HTML untuk menampilkan perbandingan
-                const keyBlock = document.createElement('div');
-                keyBlock.className = 'p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm';
-
-                let answerHTML = '';
-                if (isBestAnswer) {
-                    // Jika user menjawab benar (skor 5)
-                    answerHTML = `
-                        <p class="text-sm text-green-700">
-                            <strong class="font-semibold">Jawaban Anda (Skor 5):</strong> ${userAnswerText}
-                        </p>
-                    `;
-                } else {
-                    // Jika user menjawab selain skor 5
-                    answerHTML = `
-                        <p class="text-sm ${userWeight === 0 ? 'text-gray-500' : 'text-red-700'}">
-                            <strong class="font-semibold">Jawaban Anda (Skor ${userWeight}):</strong> ${userAnswerText}
-                        </p>
-                        <p class="text-sm text-green-700 mt-2">
-                            <strong class="font-semibold">Jawaban Terbaik (Skor 5):</strong> ${bestAnswerText}
-                        </p>
-                    `;
-                }
-
-                // BARU: Buat HTML untuk Analisis Rasional
-                const bestRationale = q.rational_best || "Analisis untuk jawaban terbaik belum tersedia.";
-                const worstRationale = q.rational_worst || "Analisis untuk jawaban terendah belum tersedia.";
-
-                const rationaleHTML = `
-                    <div class="rational-analysis mt-4 pt-3 border-t border-gray-200 space-y-2 text-xs text-gray-700">
-                        <div class="p-3 bg-green-50 border border-green-200 rounded-md">
-                            <strong classlogo="font-semibold text-green-800">Analisis Skor 5 (Terbaik):</strong>
-                            <p class="mt-1">${bestRationale}</p>
-                            <em class="block mt-1 text-gray-500 text-xs">Tindakan: "${bestAnswerText}"</em>
-                        </div>
-                        <div class="p-3 bg-red-50 border border-red-200 rounded-md mt-2">
-                            <strong class="font-semibold text-red-800">Analisis Skor 1 (Terendah):</strong>
-                            <p class="mt-1">${worstRationale}</p>
-                            <em class="block mt-1 text-gray-500 text-xs">Tindakan: "${worstAnswerText}"</em>
-                        </div>
-                    </div>
-                `;
-
-                // Gabungkan semua
-                keyBlock.innerHTML = `
-                    <p class="font-semibold text-gray-800 mb-3">${index + 1}. ${q.question}</p>
-                    <div class="mt-2 space-y-1">
-                        ${answerHTML}
-                    </div>
-                    ${rationaleHTML} <!-- Tambahkan rasional di sini -->
-                `;
-                
-                answerKeyList.appendChild(keyBlock);
-            });
-        }
-
-        function restartQuiz() {
-            currentQuestionIndex = 0;
-            currentPartIndex = 0;
-            for (const key in userAnswers) {
-                delete userAnswers[key];
-            }
-            allScores.kepribadian = 0;
-            allScores.sosial = 0;
-            allScores.profesional = 0;
-            allScores.total = 0;
-
-            finalResultsContainer.classList.add('hidden');
-            partialResultsContainer.classList.add('hidden'); // Sembunyikan juga hasil parsial
-            quizContainer.classList.remove('hidden');
-
-            // Kosongkan juga daftar kunci jawaban
-            document.getElementById('answer-key-list').innerHTML = '';
-            
-            // Re-initialize quiz untuk mengacak ulang pilihan jawaban
-            initializeQuiz(); 
-            
-            displayQuestion(0);
-        }
-
-        // Event Listeners
+        // Tunggu DOM siap sebelum menjalankan skrip apa pun yang berinteraksi dengan DOM
         document.addEventListener('DOMContentLoaded', () => {
-            initializeQuiz();
-            displayQuestion(0);
-        });
 
-        nextBtn.addEventListener('click', nextQuestion);
-        prevBtn.addEventListener('click', prevQuestion);
-        finishPartBtn.addEventListener('click', showPartialResults); // Tombol baru
-        nextPartBtn.addEventListener('click', startNextPart); // Tombol baru
-        quizForm.addEventListener('submit', calculateFinalResults); // Ganti nama fungsi
-        finalRestartBtn.addEventListener('click', restartQuiz); // Ganti nama tombol
-        printReviewBtn.addEventListener('click', () => {
-            window.print();
-        }); // Listener baru untuk cetak
+            // Elemen DOM
+            const quizContainer = document.getElementById('quiz-container');
+            const resultContainer = document.getElementById('result-container');
+            
+            const sectionTitleEl = document.getElementById('section-title');
+            const questionCounter = document.getElementById('question-counter');
+            const progressBar = document.getElementById('progress-bar');
+            const questionEl = document.getElementById('question');
+            const optionsEl = document.getElementById('options');
+            
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            
+            const scoreEl = document.getElementById('score');
+            const maxScoreInfoEl = document.getElementById('max-score-info');
+            const scoreTextEl = document.getElementById('score-text');
+            const printBtn = document.getElementById('print-btn');
+            const analysisContainer = document.getElementById('analysis-container');
+
+            function loadQuestion() {
+                // Hapus opsi sebelumnya
+                optionsEl.innerHTML = '';
+
+                // Ambil pertanyaan saat ini
+                const currentQuestion = questions[currentQuestionIndex];
+                
+                // Set teks pertanyaan
+                questionEl.innerHTML = `<p>${currentQuestion.question}</p>`; // Menggunakan innerHTML untuk memformat jika ada
+                
+                // Set Judul Bagian
+                if (currentQuestionIndex < 23) {
+                    sectionTitleEl.textContent = "Bagian 1: Kompetensi Kepribadian";
+                } else if (currentQuestionIndex < 46) {
+                    sectionTitleEl.textContent = "Bagian 2: Kompetensi Sosial";
+                } else {
+                    sectionTitleEl.textContent = "Bagian 3: Kompetensi Profesional";
+                }
+                
+                // Set info counter & progress bar
+                questionCounter.textContent = `Pertanyaan ${currentQuestionIndex + 1} dari ${questions.length}`;
+                const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+
+                // Buat tombol untuk setiap opsi
+                currentQuestion.options.forEach(option => {
+                    const optionLetter = option.substring(0, 1); // Mendapat 'A', 'B', 'C', 'D', 'E'
+                    const optionText = option.substring(2); // Mendapat teks setelah 'A. '
+                    
+                    const button = document.createElement('button');
+                    button.className = 'w-full text-left p-4 rounded-lg border border-gray-300 bg-gray-50 hover:bg-blue-100 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500';
+                    button.innerHTML = `<span class="font-bold text-blue-700">${optionLetter}.</span> ${optionText}`;
+                    button.dataset.option = optionLetter;
+
+                    // Tambahkan event listener untuk memilih
+                    button.addEventListener('click', () => selectOption(button, optionLetter));
+
+                    // Jika sudah pernah dijawab, tandai
+                    if (userAnswers[currentQuestionIndex] === optionLetter) {
+                        button.classList.add('selected-option');
+                    }
+
+                    optionsEl.appendChild(button);
+                });
+
+                // Update status tombol navigasi
+                updateNavButtons();
+            }
+
+            function selectOption(button, optionLetter) {
+                // Hapus kelas 'selected-option' dari semua tombol di grup ini
+                const allOptions = optionsEl.querySelectorAll('button');
+                allOptions.forEach(btn => {
+                    btn.classList.remove('selected-option');
+                    btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600'); // Reset style
+                    btn.classList.add('bg-gray-50', 'border-gray-300'); // Kembali ke style awal
+                });
+
+                // Tambahkan kelas 'selected-option' ke tombol yang diklik
+                button.classList.add('selected-option');
+                
+                // Simpan jawaban
+                userAnswers[currentQuestionIndex] = optionLetter;
+            }
+
+            function updateNavButtons() {
+                // Tombol 'Sebelumnya'
+                prevBtn.disabled = currentQuestionIndex === 0;
+
+                // Tombol 'Berikutnya' dan 'Selesai'
+                if (currentQuestionIndex === questions.length - 1) {
+                    // Ini pertanyaan terakhir
+                    nextBtn.classList.add('hidden');
+                    submitBtn.classList.remove('hidden');
+                } else {
+                    // Bukan pertanyaan terakhir
+                    nextBtn.classList.remove('hidden');
+                    submitBtn.classList.add('hidden');
+                }
+            }
+
+            function nextQuestion() {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    loadQuestion();
+                }
+            }
+
+            function prevQuestion() {
+                if (currentQuestionIndex > 0) {
+                    currentQuestionIndex--;
+                    loadQuestion();
+                }
+            }
+
+            function showResults() {
+                // Hitung skor
+                let totalScore = 0;
+                const maxScore = questions.length * 5; // Skor maks adalah 5 per pertanyaan
+                
+                // Siapkan HTML untuk analisis
+                let analysisHtml = '<h2 class="text-2xl font-bold mb-6 border-t pt-8">Rincian Analisis Jawaban</h2>';
+
+                for (let i = 0; i < questions.length; i++) {
+                    const q = questions[i];
+                    const chosenOption = userAnswers[i]; // Misal: "A"
+                    let userScore = 0;
+
+                    if (chosenOption) {
+                        // Ambil bobot dari jawaban yang dipilih
+                        if (q.weights && q.weights[chosenOption]) {
+                            userScore = q.weights[chosenOption];
+                            totalScore += userScore;
+                        }
+                    }
+                    
+                    // Cari jawaban ideal (skor 5)
+                    const idealAnswer = Object.keys(q.weights).find(key => q.weights[key] === 5);
+                    const idealOptionText = q.options.find(opt => opt.startsWith(idealAnswer));
+                    const userAnswerText = chosenOption ? q.options.find(opt => opt.startsWith(chosenOption)) : 'Tidak dijawab';
+
+                    // Tentukan Judul Bagian untuk analisis
+                    let sectionTitle = "";
+                    if (i === 0) {
+                        sectionTitle = '<h3 class="text-xl font-bold text-gray-800 mb-4 mt-6">Bagian 1: Kompetensi Kepribadian</h3>';
+                    } else if (i === 23) {
+                        sectionTitle = '<h3 class="text-xl font-bold text-gray-800 mb-4 mt-6">Bagian 2: Kompetensi Sosial</h3>';
+                    } else if (i === 46) {
+                        sectionTitle = '<h3 class="text-xl font-bold text-gray-800 mb-4 mt-6">Bagian 3: Kompetensi Profesional</h3>';
+                    }
+
+                    // Buat HTML untuk setiap item analisis
+                    analysisHtml += `
+                        ${sectionTitle}
+                        <div class="analysis-item mb-6 p-4 border rounded-lg bg-gray-50">
+                            <p class="font-semibold text-gray-800">Pertanyaan ${i + 1}:</p>
+                            <p class="mb-3">${q.question}</p>
+                            
+                            <p class="text-sm ${chosenOption === idealAnswer ? 'text-green-700' : 'text-blue-700'}">
+                                <span class="font-bold">Jawaban Anda:</span> ${userAnswerText} 
+                                <span class="font-bold">(Skor: ${userScore})</span>
+                            </p>
+                            
+                            ${chosenOption !== idealAnswer ? `
+                            <p class="text-sm text-green-700">
+                                <span class="font-bold">Jawaban Ideal (Skor 5):</span> ${idealOptionText}
+                            </p>
+                            ` : ''}
+                            
+                            <p class="text-sm mt-3 text-gray-600">
+                                <strong class="text-gray-900">Rasional:</strong> ${q.rationale}
+                            </p>
+                        </div>
+                    `;
+                }
+
+                // Tampilkan hasil
+                quizContainer.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+                scoreTextEl.textContent = "Total Skor Anda (berdasarkan bobot jawaban):";
+                scoreEl.textContent = `${totalScore}`; // Tampilkan skor yang didapat
+                maxScoreInfoEl.textContent = `(dari skor maksimal ${maxScore})`; // Tampilkan skor maks
+                
+                // Masukkan HTML analisis ke dalam kontainer
+                analysisContainer.innerHTML = analysisHtml;
+            }
+
+            function restartQuiz() {
+                currentQuestionIndex = 0;
+                userAnswers.fill(null);
+                
+                resultContainer.classList.add('hidden');
+                quizContainer.classList.remove('hidden');
+                
+                // Kosongkan analisis
+                analysisContainer.innerHTML = '';
+                
+                loadQuestion();
+            }
+
+// Event Listeners
+            nextBtn.addEventListener('click', nextQuestion);
+            prevBtn.addEventListener('click', prevQuestion);
+            submitBtn.addEventListener('click', showResults);
+            restartBtn.addEventListener('click', restartQuiz);
+            printBtn.addEventListener('click', () => {
+                window.print(); // Memicu dialog cetak
+            });
+
+            // Muat pertanyaan pertama saat halaman dibuka
+            loadQuestion();
+        
+        });
 
     </script>
 </body>
