@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Tes Substansi BCKS 2025</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat font Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Sembunyikan semua soal secara default */
+        .question-block {
+            display: none;
+        }
+        /* Tampilkan soal yang aktif */
+        .question-block.active {
+            display: block;
+        }
+        /* Styling untuk radio button yang dipilih */
+        input[type="radio"]:checked + label {
+            background-color: #dbeafe; /* bg-blue-100 */
+            border-color: #3b82f6; /* border-blue-500 */
+        }
+
+        /* Aturan Cetak PDF */
+        @media print {
+            /* Sembunyikan semua elemen yang tidak perlu dicetak */
+            header, 
+            #quiz-container, 
+            #partial-results-container, 
+            #final-results-container > h2, 
+            #final-results-container > .grid, 
+            #final-results-container > .bg-gray-100,
+            #final-results-container > div.mt-10 { /* Ini menyembunyikan wrapper tombol Ulangi/Cetak */
+                display: none;
+            }
+
+            /* Pastikan container utama dan container hasil akhir terlihat */
+            body > .container, 
+            #final-results-container {
+                display: block;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+
+            /* Fokuskan pada Tinjauan Jawaban */
+            #answer-key-container {
+                display: block;
+                margin-top: 0;
+                box-shadow: none;
+                border: none;
+            }
+            
+            #answer-key-list .p-4 {
+                box-shadow: none;
+                border: 1px solid #e5e7eb; /* border-gray-200 */
+                page-break-inside: avoid; /* Hindari pecah halaman di tengah blok soal */
+            }
+
+            /* Aturan cetak untuk analisis rasional */
+            .rational-analysis {
+                display: block;
+                border-top: 1px solid #eee;
+            }
+            .rational-analysis div {
+                background-color: #fafafa !important; /* Gunakan warna netral saat cetak */
+                border: 1px solid #ddd !important;
+                color: #000 !important; /* Pastikan teks hitam */
+            }
+            .rational-analysis strong {
+                color: #000 !important;
+            }
+
+            /* Hapus warna teks agar default ke hitam (opsional) */
+            .text-green-700, .text-red-700, .text-gray-500, .text-gray-800 {
+                color: #000;
+            }
+        }
+        /* Akhir Aturan Cetak */
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Saya perlebar container utama agar muat untuk tinjauan jawaban -->
+    <div class="container max-w-5xl mx-auto p-6 md:p-10">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-700">Simulasi Tes Substansi BCKS 2025</h1>
+            <p class="text-lg text-gray-600 mt-2">Berdasarkan Model Kompetensi Kepala Sekolah 2023</p>
+        </header>
+
+        <!-- Area Konten Kuis -->
+        <div id="quiz-container" class="bg-white p-6 md:p-8 rounded-xl shadow-2xl transition-all duration-300">
+            
+            <!-- Area Progres -->
+            <div id="progress-area" class="mb-6 text-center">
+                <p id="progress-text" class="text-lg font-semibold text-blue-600">Soal 1 dari 70</p>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 1.4%"></div>
+                </div>
+            </div>
+
+            <!-- Judul Kompetensi -->
+            <div class="mb-6 text-center">
+                <h2 id="component-title" class="text-2xl font-bold text-gray-700">Kompetensi Kepribadian</h2>
+            </div>
+
+            <!-- Form Kuis -->
+            <form id="quiz-form">
+                <!-- Soal-soal akan di-generate oleh JavaScript di sini -->
+                <div id="questions-wrapper"></div>
+
+                <!-- Navigasi -->
+                <div id="navigation" class="mt-8 pt-6 border-t border-gray-200 flex justify-between items-center">
+                    <button type="button" id="prev-btn" class="bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Sebelumnya
+                    </button>
+                    
+                    <!-- Tombol ini untuk soal berikutnya -->
+                    <button type="button" id="next-btn" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition-all duration-200">
+                        Selanjutnya
+                    </button>
+
+                    <!-- Tombol ini untuk menyelesaikan per bagian -->
+                    <button type="button" id="finish-part-btn" class="hidden bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition-all duration-200">
+                        Selesai Bagian Ini
+                    </button>
+
+                    <!-- Tombol ini untuk submit seluruh tes di akhir -->
+                    <button type="submit" id="finish-quiz-btn" class="hidden bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition-all duration-200">
+                        Selesaikan Tes
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Area Hasil Per Bagian -->
+        <div id="partial-results-container" class="hidden bg-white p-6 md:p-10 rounded-xl shadow-2xl mt-10 text-center">
+            <h2 class="text-3xl font-bold text-blue-700 mb-4">Selesai Bagian: <span id="partial-component-name"></span></h2>
+            <p class="text-lg text-gray-600 mb-6">Skor Anda untuk bagian ini:</p>
+            <div class="bg-gray-100 p-6 rounded-lg inline-block">
+                <p class="text-5xl font-bold text-blue-600" id="partial-score">0 / 0</p>
+            </div>
+            <br>
+            <button type="button" id="next-part-btn" class="mt-10 bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition-all duration-200 text-lg">
+                Lanjut ke Bagian Berikutnya
+            </button>
+        </div>
+
+        <!-- Area Hasil Final -->
+        <div id="final-results-container" class="hidden bg-white p-6 md:p-10 rounded-xl shadow-2xl mt-10 text-center">
+            <h2 class="text-3xl font-bold text-green-700 mb-6">Hasil Simulasi Anda</h2>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <!-- Skor Kepribadian -->
+                <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Kompetensi Kepribadian</h3>
+                    <p class="text-3xl font-bold text-blue-600" id="kepribadian-score">0 / 115</p>
+                    <p class="text-sm text-gray-500">(Total 23 Soal)</p>
+                </div>
+                <!-- Skor Sosial -->
+                <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+                    <h3 class="text-xl font-semibold text-green-800 mb-2">Kompetensi Sosial</h3>
+                    <p class="text-3xl font-bold text-green-600" id="sosial-score">0 / 115</p>
+                    <p class="text-sm text-gray-500">(Total 23 Soal)</p>
+                </div>
+                <!-- Skor Profesional -->
+                <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+                    <h3 class="text-xl font-semibold text-yellow-800 mb-2">Kompetensi Profesional</h3>
+                    <p class="text-3xl font-bold text-yellow-600" id="profesional-score">0 / 120</p>
+                    <p class="text-sm text-gray-500">(Total 24 Soal)</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-100 p-6 rounded-lg">
+                <h3 class="text-2xl font-semibold text-gray-800">Total Skor</h3>
+                <p class="text-5xl font-bold text-blue-700 mt-2" id="total-score">0 / 350</p>
+            </div>
+
+            <!-- Wrapper untuk tombol-tombol Aksi -->
+            <div class="mt-10 flex flex-col md:flex-row justify-center gap-4">
+                <button type="button" id="final-restart-btn" class="bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition-all duration-200 text-lg order-2 md:order-1">
+                    Ulangi Simulasi
+                </button>
+                <button type="button" id="print-review-btn" class="bg-indigo-600 text-white py-3 px-8 rounded-lg hover:bg-indigo-700 transition-all duration-200 text-lg order-1 md:order-2">
+                    Cetak Tinjauan (PDF)
+                </button>
+            </div>
+
+            <!-- Area Tinjauan Jawaban (Kunci Jawaban) -->
+            <div id="answer-key-container" class="mt-12 text-left">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">Tinjauan Jawaban dan Analisis</h3>
+                <div id="answer-key-list" class="space-y-6">
+                    <!-- JavaScript akan mengisi bagian ini -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+            // === KOMPETENSI KEPRIBADIAN (23 Soal) ===
+            {
+                id: "q1",
+                component: "kepribadian",
+                question: "Seorang guru senior melakukan kesalahan fatal dalam menyusun soal ujian, menyebabkan protes dari orang tua. Guru tersebut sangat dihormati dan ini adalah kesalahan pertamanya. Sebagai kepala sekolah, apa yang Anda lakukan?",
+                options: [
+                    { text: "Menyalahkan guru tersebut secara terbuka di depan orang tua untuk meredakan amarah mereka.", weight: 1 },
+                    { text: "Menjelaskan kepada orang tua bahwa guru tersebut adalah guru senior yang baik dan ini hanya insiden kecil.", weight: 2 },
+                    { text: "Segera mengadakan ujian ulang dan memberikan sanksi administratif ringan kepada guru.", weight: 3 },
+                    { text: "Meminta guru tersebut untuk meminta maaf langsung kepada orang tua, sementara Anda memfasilitasi pertemuan.", weight: 4 },
+                    { text: "Mengambil tanggung jawab penuh di depan orang tua, meminta maaf atas nama sekolah, dan secara pribadi membina guru tersebut untuk memperbaiki proses.", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Ini menunjukkan integritas (taking ownership), kepemimpinan yang melindungi tim (tidak menyalahkan), dan fokus pada solusi (perbaikan proses). Ini membangun kepercayaan publik dan internal.",
+                rational_worst: "Alasan (Skor 1): Ini adalah tindakan 'melempar badan' yang merusak moral guru, menunjukkan kurangnya integritas kepemimpinan, dan tidak menyelesaikan masalah akar (kesalahan proses)."
+            },
+            {
+                id: "q2",
+                component: "kepribadian",
+                question: "Anda mendapatkan data bahwa ada indikasi 'dana titipan' dalam proses PPDB. Padahal Anda baru saja menandatangani pakta integritas. Tindakan Anda adalah...",
+                options: [
+                    { text: "Mengabaikannya karena sudah menjadi 'rahasia umum' dan untuk 'menambah' anggaran sekolah.", weight: 1 },
+                    { text: "Meminta panitia untuk lebih berhati-hati agar tidak ketahuan oleh publik atau media.", weight: 2 },
+                    { text: "Membuat surat edaran baru yang melarang dana titipan tanpa mengusut yang sudah terjadi.", weight: 3 },
+                    { text: "Mengumpulkan panitia, mengingatkan kembali pakta integritas, dan menghentikan praktik tersebut untuk sisa proses.", weight: 4 },
+                    { text: "Segera menginvestigasi, menghentikan praktik tersebut, dan mengembalikan dana yang sudah masuk secara transparan.", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Menunjukkan integritas level tertinggi. Tidak hanya menghentikan, tetapi juga proaktif menginvestigasi dan transparan mengembalikan dana, memulihkan kepercayaan.",
+                rational_worst: "Alasan (Skor 1): Ini adalah pelanggaran integritas yang jelas, mengabaikan sumpah/pakta, dan berpotensi melanggar hukum."
+            },
+            {
+                id: "q3",
+                component: "kepribadian",
+                question: "Sekolah Anda gagal total dalam sebuah kompetisi bergengsi tingkat provinsi. Tim guru dan siswa yang sudah bekerja keras merasa sangat kecewa dan saling menyalahkan. Respon pertama Anda adalah...",
+                options: [
+                    { text: "Mencari siapa yang paling bertanggung jawab atas kegagalan strategi dan menegurnya.", weight: 1 },
+                    { text: "Mengatakan pada tim bahwa kompetisi itu tidak penting dan lupakan saja.", weight: 2 },
+                    { text: "Segera membubarkan tim dan menggantinya dengan pembina baru untuk tahun depan.", weight: 3 },
+                    { text: "Memberikan ucapan terima kasih atas kerja keras mereka, dan langsung merencanakan evaluasi.", weight: 4 },
+                    { text: "Mengumpulkan seluruh tim, mengapresiasi proses dan kerja keras mereka, dan memimpin refleksi bersama untuk belajar dari kegagalan.", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Menunjukkan resiliensi dan kepemimpinan (growth mindset). Fokusnya adalah pada manusia (apresiasi) dan pembelajaran (refleksi), bukan pada kegagalan.",
+                rational_worst: "Alasan (Skor 1): Mencari kambing hitam (blame culture) adalah tindakan yang merusak tim, mematikan inisiatif, dan menunjukkan kepemimpinan yang buruk."
+            },
+            // Placeholder Kepribadian (q4 - q23)
+            ...Array.from({ length: 20 }, (_, i) => ({
+                id: `q${i + 4}`,
+                component: "kepribadian",
+                question: `[Soal Kepribadian ${i + 4}] Anda menghadapi dilema etika yang kompleks terkait kebijakan baru dari dinas. Kebijakan itu tampaknya merugikan sebagian siswa miskin. Apa prioritas tindakan Anda?`,
+                options: [
+                    { text: "Opsi E (Tidak Tepat / Pasif)", weight: 1 },
+                    { text: "Opsi D (Kurang Bijak)", weight: 2 },
+                    { text: "Opsi C (Standar / Reaktif)", weight: 3 },
+                    { text: "Opsi B (Baik / Proaktif)", weight: 4 },
+                    { text: "Opsi A (Sangat Ideal / Berintegritas & Solutif)", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Jawaban ini (Opsi A) menunjukkan integritas, kepemimpinan, dan fokus pada solusi yang berpihak pada murid.",
+                rational_worst: "Alasan (Skor 1): Jawaban ini (Opsi E) menunjukkan sikap pasif, mengabaikan masalah, atau bahkan melanggar etika."
+            })),
+
+            // === KOMPETENSI SOSIAL (23 Soal) ===
+            {
+                id: "q24",
+                component: "sosial",
+                question: "Tokoh masyarakat setempat meminta izin untuk menggunakan lapangan sekolah untuk acara kampanye politik. Tokoh ini berpengaruh dan telah banyak membantu sekolah. Sikap Anda?",
+                options: [
+                    { text: "Langsung mengizinkan untuk menjaga hubungan baik, tanpa mempedulikan potensi masalah.", weight: 1 },
+                    { text: "Mengatakan Anda akan 'mempertimbangkannya' dan berharap mereka lupa, sambil menghindari telepon mereka.", weight: 2 },
+                    { text: "Mengizinkan, tetapi dengan syarat yang sangat ketat dan meminta 'sumbangan' untuk sekolah.", weight: 3 },
+                    { text: "Menolak permintaan tersebut dengan tegas namun sopan, dengan mengutip peraturan yang berlaku.", weight: 4 },
+                    { text: "Menjelaskan secara diplomatis bahwa regulasi (zona netral) melarang fasilitas sekolah untuk politik, namun menawarkan kolaborasi untuk acara lain yang netral.", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Ini adalah 'Assertive-Diplomatic'. Menegakkan aturan (integritas) sambil tetap menjaga hubungan sosial (menawarkan alternatif) adalah solusi terbaik.",
+                rational_worst: "Alasan (Skor 1): Mengorbankan netralitas sekolah (zona pendidikan) untuk kepentingan pribadi/politik, melanggar aturan dan berisiko tinggi."
+            },
+            {
+                id: "q25",
+                component: "sosial",
+                question: "Sekelompok orang tua siswa memprotes kebijakan 'kantin sehat' Anda yang melarang penjualan makanan instan, karena dianggap merepotkan. Mereka datang ke sekolah dengan emosi. Bagaimana Anda menghadapinya?",
+                options: [
+                    { text: "Menolak bertemu karena mereka datang dengan cara yang tidak sopan.", weight: 1 },
+                    { text: "Menemui mereka dan berdebat bahwa kebijakan Anda benar demi kesehatan siswa.", weight: 2 },
+                    { text: "Menemui mereka, mendengarkan, lalu berjanji akan meninjau ulang kebijakan tersebut (untuk meredakan situasi).", weight: 3 },
+                    { text: "Mempersilakan perwakilan orang tua masuk, mendengarkan keluhan mereka dengan tenang, dan berjanji akan mencari solusi bersama.", weight: 4 },
+                    { text: "Mempersilakan perwakilan masuk, mendengarkan dengan empati, menyajikan data/alasan kebijakan, dan membuka forum dialog untuk mencari win-win solution (misal: kantin menyediakan menu sehat tapi praktis).", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Menunjukkan empati, komunikasi asertif (menyajikan data), dan kolaborasi (mencari win-win solution). Ini mengubah konflik menjadi kemitraan.",
+                rational_worst: "Alasan (Skor 1): Menghindari konflik dan tidak menghargai orang tua sebagai mitra sekolah. Ini akan memperburuk masalah dan hubungan."
+            },
+            {
+                id: "q26",
+                component: "sosial",
+                question: "Terjadi konflik terbuka antara dua guru senior di ruang guru, yang mengganggu kenyamanan guru lain. Keduanya memiliki pendukung masing-masing. Langkah pertama Anda adalah...",
+                options: [
+                    { text: "Mengabaikannya, berharap masalah akan selesai dengan sendirinya.", weight: 1 },
+                    { text: "Menegur keduanya di depan guru-guru lain agar mereka malu dan berhenti.", weight: 2 },
+                    { text: "Membuat aturan baru di ruang guru tanpa mengatasi konflik intinya.", weight: 3 },
+                    { text: "Memanggil keduanya secara terpisah untuk mendengarkan masalah dari masing-masing pihak.", weight: 4 },
+                    { text: "Memanggil keduanya, pertama secara terpisah untuk empati, lalu bersama-sama untuk mediasi yang fokus pada solusi dan profesionalisme kerja.", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Ini adalah manajemen konflik yang lengkap. Mendengar secara terpisah (empati) dan mediasi bersama (solusi) adalah langkah yang sistematis untuk menyelesaikan akar masalah.",
+                rational_worst: "Alasan (Skor 1): Mengabaikan konflik adalah kepemimpinan yang absen (absentee leadership). Konflik di ruang guru akan meracuni budaya sekolah jika dibiarkan."
+            },
+            // Placeholder Sosial (q27 - q46)
+            ...Array.from({ length: 20 }, (_, i) => ({
+                id: `q${i + 27}`,
+                component: "sosial",
+                question: `[Soal Sosial ${i + 4}] Ada kesenjangan komunikasi antara sekolah dan komite sekolah. Komite merasa tidak dilibatkan dalam pengambilan keputusan. Apa langkah Anda untuk membangun kemitraan?`,
+                options: [
+                    { text: "Opsi E (Menghindar / Menyalahkan)", weight: 1 },
+                    { text: "Opsi D (Kurang Efektif)", weight: 2 },
+                    { text: "Opsi C (Reaktif / Formalitas)", weight: 3 },
+                    { text: "Opsi B (Komunikatif)", weight: 4 },
+                    { text: "Opsi A (Sangat Ideal / Kolaboratif & Empatik)", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Jawaban ini (Opsi A) menunjukkan kemampuan membangun kemitraan yang proaktif, transparan, dan setara (kolaboratif).",
+                rational_worst: "Alasan (Skor 1): Jawaban ini (Opsi E) justru merusak hubungan sosial, menghindari tanggung jawab, dan menunjukkan komunikasi yang buruk."
+            })),
+
+            // === KOMPETENSI PROFESIONAL (24 Soal) ===
+            {
+                id: "q47",
+                component: "profesional",
+                question: "Data Rapor Pendidikan sekolah Anda menunjukkan hasil literasi siswa berada di bawah rata-rata nasional selama dua tahun berturut-turut. Langkah prioritas Anda adalah...",
+                options: [
+                    { text: "Meragukan validitas data Rapor Pendidikan dan meminta guru 'memperbaiki' data.", weight: 1 },
+                    { text: "Menyimpulkan ini adalah masalah 'minat baca' anak-anak zaman sekarang karena gadget.", weight: 2 },
+                    { text: "Mengirim semua guru Bahasa Indonesia untuk mengikuti pelatihan literasi terbaru.", weight: 3 },
+                    { text: "Segera mewajibkan program 'jam membaca' setiap hari sebelum kelas dimulai.", weight: 4 },
+                    { text: "Membentuk tim literasi, menganalisis data secara mendalam, mengidentifikasi akar masalah, dan menyusun program intervensi terfokus.", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Ini adalah kepemimpinan profesional berbasis data. Tidak langsung melompat ke solusi, tetapi menganalisis akar masalah (PBD: Perencanaan Berbasis Data) terlebih dahulu.",
+                rational_worst: "Alasan (Skor 1): Ini adalah pelanggaran integritas data dan tidak profesional. Menolak data tanpa analisis menunjukkan ketidakmampuan manajerial."
+            },
+            {
+                id: "q48",
+                component: "profesional",
+                question: "Anda melakukan supervisi akademik dan menemukan seorang guru menggunakan metode mengajar yang sangat monoton dan tidak efektif (ceramah), padahal materi pelajarannya sangat penting. Respon Anda pasca-supervisi?",
+                options: [
+                    { text: "Langsung menegur guru tersebut di tempat karena metodenya salah.", weight: 1 },
+                    { text: "Memberikan nilai supervisi yang buruk tanpa memberikan umpan balik.", weight: 2 },
+                    { text: "Memberikan pujian atas 'upaya' guru, tapi tidak menyinggung masalah metode mengajar.", weight: 3 },
+                    { text: "Meminta guru tersebut untuk melihat cara mengajar guru lain yang lebih baik.", weight: 4 },
+                    { text: "Mengajak guru berdialog (coaching), menanyakan refleksi guru atas proses mengajarnya, dan bersama-sama mencari strategi baru yang lebih interaktif.", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Ini adalah supervisi akademik modern (coaching). Tujuannya adalah memberdayakan guru melalui refleksi, bukan menghakimi. Ini menciptakan budaya belajar yang aman.",
+                rational_worst: "Alasan (Skor 1): Supervisi yang menghakimi di depan umum (atau bahkan saat proses mengajar) adalah tidak etis dan merusak mental guru serta proses belajar siswa."
+            },
+            {
+                id: "q49",
+                component: "profesional",
+                question: "Anggaran sekolah (BOS) sangat terbatas, sementara ada banyak kebutuhan mendesak untuk perbaikan sarana dan program kesiswaan. Prioritas Anda dalam mengelola anggaran adalah...",
+                options: [
+                    { text: "Menggunakan anggaran untuk 'proyek' yang terlihat bagus dari luar, seperti mengecat gerbang.", weight: 1 },
+                    { text: "Membagi rata anggaran ke semua wakil kepala sekolah agar adil.", weight: 2 },
+                    { text: "Memfokuskan anggaran hanya pada perbaikan sarana fisik, mengabaikan program siswa.", weight: 3 },
+                    { text: "Menggunakan Rapor Pendidikan dan evaluasi diri sekolah (EDS) untuk menentukan program prioritas.", weight: 4 },
+                    { text: "Melakukan analisis kebutuhan prioritas berbasis data (Rapor Pendidikan/EDS), dan mengalokasikan anggaran terbesar pada program yang berdampak langsung pada peningkatan mutu pembelajaran.", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Ini adalah manajemen anggaran berbasis prioritas (PBD). Fokusnya adalah pada dampak (mutu pembelajaran), bukan sekadar 'terlihat' bagus atau 'adil' dibagi rata.",
+                rational_worst: "Alasan (Skor 1): Ini adalah manajemen yang buruk, fokus pada kosmetik (penampilan) bukan substansi (pembelajaran), dan membuang anggaran yang terbatas."
+            },
+            // Placeholder Profesional (q50 - q70)
+            ...Array.from({ length: 21 }, (_, i) => ({ // (70 - 49) + 1 = 21
+                id: `q${i + 50}`,
+                component: "profesional",
+                question: `[Soal Profesional ${i + 4}] Kurikulum Merdeka menuntut pembelajaran berdiferensiasi. Namun, banyak guru masih bingung dalam implementasinya. Apa langkah manajerial Anda?`,
+                options: [
+                    { text: "Opsi E (Tidak Relevan / Pasif)", weight: 1 },
+                    { text: "Opsi D (Instruktif / Satu Arah)", weight: 2 },
+                    { text: "Opsi C (Standar / Pelatihan Formal)", weight: 3 },
+                    { text: "Opsi B (Fasilitatif / Komunitas Belajar)", weight: 4 },
+                    { text: "Opsi A (Sangat Ideal / Berbasis Data & Berkelanjutan)", weight: 5 }
+                ],
+                rational_best: "Alasan (Skor 5): Jawaban ini (Opsi A) menunjukkan kepemimpinan pembelajaran (instructional leadership) yang sistematis, berbasis data, dan berkelanjutan (menciptakan komunitas belajar).",
+                rational_worst: "Alasan (Skor 1): Jawaban ini (Opsi E) menunjukkan kegagalan dalam peran utama kepala sekolah sebagai pemimpin pembelajaran."
+            }))
+        ];
+
+        let currentQuestionIndex = 0;
+        let currentPartIndex = 0; // 0: Kepribadian, 1: Sosial, 2: Profesional
+        const userAnswers = {};
+        const allScores = {
+            kepribadian: 0,
+            sosial: 0,
+            profesional: 0,
+            total: 0
+        };
+
+        const partBoundaries = [
+            { name: "Kepribadian", start: 0, end: 22, count: 23, maxScore: 23 * 5 },
+            { name: "Sosial", start: 23, end: 45, count: 23, maxScore: 23 * 5 },
+            { name: "Profesional", start: 46, end: 69, count: 24, maxScore: 24 * 5 }
+        ];
+
+        const maxScores = {
+            kepribadian: 23 * 5,
+            sosial: 23 * 5,
+            profesional: 24 * 5,
+            total: (23 * 5) + (23 * 5) + (24 * 5)
+        };
+
+        const questionsWrapper = document.getElementById('questions-wrapper');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const finishPartBtn = document.getElementById('finish-part-btn');
+        const finishQuizBtn = document.getElementById('finish-quiz-btn');
+        const quizContainer = document.getElementById('quiz-container');
+        const componentTitle = document.getElementById('component-title'); // Variabel baru
+
+        // Kontainer Hasil Parsial
+        const partialResultsContainer = document.getElementById('partial-results-container');
+        const partialComponentName = document.getElementById('partial-component-name');
+        const partialScore = document.getElementById('partial-score');
+        const nextPartBtn = document.getElementById('next-part-btn');
+        
+        // Kontainer Hasil Final
+        const finalResultsContainer = document.getElementById('final-results-container');
+        const quizForm = document.getElementById('quiz-form');
+        const finalRestartBtn = document.getElementById('final-restart-btn');
+        const printReviewBtn = document.getElementById('print-review-btn'); // Tombol baru
+
+        function initializeQuiz() {
+            questionsWrapper.innerHTML = ''; // Kosongkan wrapper
+            questions.forEach((q, index) => {
+                const questionBlock = document.createElement('div');
+                questionBlock.id = `question-${q.id}`;
+                questionBlock.className = 'question-block';
+                if (index === 0) {
+                    questionBlock.classList.add('active'); // Tampilkan soal pertama
+                }
+
+                let optionsHTML = q.options
+                    .sort(() => Math.random() - 0.5) // Acak urutan pilihan jawaban
+                    .map((opt, i) => `
+                    <div class="option-wrapper">
+                        <input type="radio" id="opt-${q.id}-${i}" name="${q.id}" value="${opt.weight}" class="hidden" required>
+                        <label for="opt-${q.id}-${i}" class="block w-full p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200 text-gray-700">
+                            ${opt.text}
+                        </label>
+                    </div>
+                `).join('');
+
+                questionBlock.innerHTML = `
+                    <p class="text-lg md:text-xl font-medium mb-6 leading-relaxed">${index + 1}. ${q.question}</p>
+                    <div class="options-container space-y-4">
+                        ${optionsHTML}
+                    </div>
+                `;
+                questionsWrapper.appendChild(questionBlock);
+            });
+
+            // Tambahkan event listener ke radio button yang baru dibuat
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const qId = e.target.name;
+                    const weight = parseInt(e.target.value);
+                    userAnswers[qId] = weight;
+                    
+                    // Otomatis pindah ke soal berikutnya jika bukan soal terakhir
+                    setTimeout(() => {
+                        const currentPart = partBoundaries[currentPartIndex];
+                        if (currentQuestionIndex < currentPart.end) {
+                            nextQuestion();
+                        }
+                        // Jika ini soal terakhir di bagian itu, jangan auto-next.
+                        // Biarkan pengguna menekan tombol "Selesai Bagian Ini".
+                    }, 300); // Tunda sedikit
+                });
+            });
+        }
+
+        function displayQuestion(index) {
+            // Perbarui judul kompetensi
+            componentTitle.textContent = "Kompetensi " + partBoundaries[currentPartIndex].name;
+
+            document.querySelectorAll('.question-block').forEach((block, i) => {
+                block.classList.toggle('active', i === index);
+            });
+            updateProgress(index);
+            updateNavigation(index);
+        }
+
+        function updateProgress(index) {
+            const questionNum = index + 1;
+            const percentage = (questionNum / questions.length) * 100;
+            progressText.textContent = `Soal ${questionNum} dari ${questions.length}`;
+            progressBar.style.width = `${percentage}%`;
+        }
+
+        function updateNavigation(index) {
+            const currentPart = partBoundaries[currentPartIndex];
+            const isEndOfPart = (index === currentPart.end);
+            const isEndOfQuiz = (index === questions.length - 1);
+
+            // Nonaktifkan tombol 'sebelumnya' di awal setiap bagian
+            prevBtn.disabled = (index === 0 || index === partBoundaries[1].start || index === partBoundaries[2].start);
+            
+            nextBtn.classList.toggle('hidden', isEndOfPart || isEndOfQuiz);
+            finishPartBtn.classList.toggle('hidden', !isEndOfPart || isEndOfQuiz); // Tampil di akhir bagian, KECUALI akhir kuis
+            finishQuizBtn.classList.toggle('hidden', !isEndOfQuiz); // Tampil HANYA di akhir kuis
+        }
+
+        function nextQuestion() {
+            // Cek apakah soal saat ini sudah dijawab
+            const currentQuestionId = questions[currentQuestionIndex].id;
+            if (userAnswers[currentQuestionId] === undefined) {
+                // Tampilkan pesan error (opsional)
+                // alert("Harap pilih salah satu jawaban.");
+                // Untuk SJT, kita izinkan lanjut
+            }
+            
+            if (currentQuestionIndex < questions.length - 1) {
+                // Pastikan tidak melompat ke bagian berikutnya
+                const currentPart = partBoundaries[currentPartIndex];
+                if(currentQuestionIndex + 1 <= currentPart.end) {
+                    currentQuestionIndex++;
+                    displayQuestion(currentQuestionIndex);
+                }
+            }
+        }
+
+        function prevQuestion() {
+            // Pastikan tidak mundur ke bagian sebelumnya
+            const currentPart = partBoundaries[currentPartIndex];
+            if (currentQuestionIndex > currentPart.start) {
+                currentQuestionIndex--;
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+
+        function showPartialResults() {
+            const currentPart = partBoundaries[currentPartIndex];
+            let partScore = 0;
+            for (let i = currentPart.start; i <= currentPart.end; i++) {
+                const qId = questions[i].id;
+                partScore += (userAnswers[qId] || 0);
+            }
+
+            // Simpan skor
+            if (currentPart.name === "Kepribadian") allScores.kepribadian = partScore;
+            if (currentPart.name === "Sosial") allScores.sosial = partScore;
+            
+            // Tampilkan
+            partialComponentName.textContent = currentPart.name;
+            partialScore.textContent = `${partScore} / ${currentPart.maxScore}`;
+
+            quizContainer.classList.add('hidden');
+            partialResultsContainer.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function startNextPart() {
+            currentPartIndex++;
+            const newPart = partBoundaries[currentPartIndex];
+            currentQuestionIndex = newPart.start;
+            
+            partialResultsContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            
+            displayQuestion(currentQuestionIndex);
+        }
+
+        function calculateFinalResults(e) {
+            e.preventDefault();
+
+            // Cek apakah semua soal sudah dijawab (opsional, untuk SJT mungkin tidak wajib)
+            
+            // 1. Hitung skor untuk bagian terakhir (Profesional)
+            const lastPart = partBoundaries[currentPartIndex]; // Harusnya Profesional
+            let lastPartScore = 0;
+            for (let i = lastPart.start; i <= lastPart.end; i++) {
+                const qId = questions[i].id;
+                lastPartScore += (userAnswers[qId] || 0);
+            }
+            allScores.profesional = lastPartScore;
+
+            // 2. Hitung total
+            allScores.total = allScores.kepribadian + allScores.sosial + allScores.profesional;
+
+            // 3. Tampilkan hasil
+            document.getElementById('kepribadian-score').textContent = `${allScores.kepribadian} / ${partBoundaries[0].maxScore}`;
+            document.getElementById('sosial-score').textContent = `${allScores.sosial} / ${partBoundaries[1].maxScore}`;
+            document.getElementById('profesional-score').textContent = `${allScores.profesional} / ${partBoundaries[2].maxScore}`;
+            document.getElementById('total-score').textContent = `${allScores.total} / ${maxScores.total}`;
+
+            quizContainer.classList.add('hidden');
+            finalResultsContainer.classList.remove('hidden');
+            window.scrollTo(0, 0); // Scroll ke atas
+
+            // Tampilkan kunci jawaban setelah hasil akhir muncul
+            displayAnswerKey();
+        }
+
+        function displayAnswerKey() {
+            const answerKeyList = document.getElementById('answer-key-list');
+            answerKeyList.innerHTML = ''; // Kosongkan daftar sebelumnya
+
+            questions.forEach((q, index) => {
+                const userWeight = userAnswers[q.id] || 0;
+                let userAnswerText = "<i>Tidak dijawab</i>";
+                let bestAnswerText = "";
+                let worstAnswerText = ""; // BARU: Teks jawaban terburuk
+                let isBestAnswer = false;
+
+                // Cari teks jawaban user, jawaban terbaik (skor 5), dan jawaban terburuk (skor 1)
+                for (const opt of q.options) {
+                    if (opt.weight === 5) {
+                        bestAnswerText = opt.text;
+                    }
+                    if (opt.weight === 1) { // BARU
+                        worstAnswerText = opt.text;
+                    }
+                    if (opt.weight === userWeight) {
+                        userAnswerText = opt.text;
+                    }
+                }
+                
+                if (userWeight === 5) {
+                    isBestAnswer = true;
+                }
+
+                // Buat HTML untuk menampilkan perbandingan
+                const keyBlock = document.createElement('div');
+                keyBlock.className = 'p-4 border border-gray-200 rounded-lg bg-gray-50 shadow-sm';
+
+                let answerHTML = '';
+                if (isBestAnswer) {
+                    // Jika user menjawab benar (skor 5)
+                    answerHTML = `
+                        <p class="text-sm text-green-700">
+                            <strong class="font-semibold">Jawaban Anda (Skor 5):</strong> ${userAnswerText}
+                        </p>
+                    `;
+                } else {
+                    // Jika user menjawab selain skor 5
+                    answerHTML = `
+                        <p class="text-sm ${userWeight === 0 ? 'text-gray-500' : 'text-red-700'}">
+                            <strong class="font-semibold">Jawaban Anda (Skor ${userWeight}):</strong> ${userAnswerText}
+                        </p>
+                        <p class="text-sm text-green-700 mt-2">
+                            <strong class="font-semibold">Jawaban Terbaik (Skor 5):</strong> ${bestAnswerText}
+                        </p>
+                    `;
+                }
+
+                // BARU: Buat HTML untuk Analisis Rasional
+                const bestRationale = q.rational_best || "Analisis untuk jawaban terbaik belum tersedia.";
+                const worstRationale = q.rational_worst || "Analisis untuk jawaban terendah belum tersedia.";
+
+                const rationaleHTML = `
+                    <div class="rational-analysis mt-4 pt-3 border-t border-gray-200 space-y-2 text-xs text-gray-700">
+                        <div class="p-3 bg-green-50 border border-green-200 rounded-md">
+                            <strong classlogo="font-semibold text-green-800">Analisis Skor 5 (Terbaik):</strong>
+                            <p class="mt-1">${bestRationale}</p>
+                            <em class="block mt-1 text-gray-500 text-xs">Tindakan: "${bestAnswerText}"</em>
+                        </div>
+                        <div class="p-3 bg-red-50 border border-red-200 rounded-md mt-2">
+                            <strong class="font-semibold text-red-800">Analisis Skor 1 (Terendah):</strong>
+                            <p class="mt-1">${worstRationale}</p>
+                            <em class="block mt-1 text-gray-500 text-xs">Tindakan: "${worstAnswerText}"</em>
+                        </div>
+                    </div>
+                `;
+
+                // Gabungkan semua
+                keyBlock.innerHTML = `
+                    <p class="font-semibold text-gray-800 mb-3">${index + 1}. ${q.question}</p>
+                    <div class="mt-2 space-y-1">
+                        ${answerHTML}
+                    </div>
+                    ${rationaleHTML} <!-- Tambahkan rasional di sini -->
+                `;
+                
+                answerKeyList.appendChild(keyBlock);
+            });
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            currentPartIndex = 0;
+            for (const key in userAnswers) {
+                delete userAnswers[key];
+            }
+            allScores.kepribadian = 0;
+            allScores.sosial = 0;
+            allScores.profesional = 0;
+            allScores.total = 0;
+
+            finalResultsContainer.classList.add('hidden');
+            partialResultsContainer.classList.add('hidden'); // Sembunyikan juga hasil parsial
+            quizContainer.classList.remove('hidden');
+
+            // Kosongkan juga daftar kunci jawaban
+            document.getElementById('answer-key-list').innerHTML = '';
+            
+            // Re-initialize quiz untuk mengacak ulang pilihan jawaban
+            initializeQuiz(); 
+            
+            displayQuestion(0);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeQuiz();
+            displayQuestion(0);
+        });
+
+        nextBtn.addEventListener('click', nextQuestion);
+        prevBtn.addEventListener('click', prevQuestion);
+        finishPartBtn.addEventListener('click', showPartialResults); // Tombol baru
+        nextPartBtn.addEventListener('click', startNextPart); // Tombol baru
+        quizForm.addEventListener('submit', calculateFinalResults); // Ganti nama fungsi
+        finalRestartBtn.addEventListener('click', restartQuiz); // Ganti nama tombol
+        printReviewBtn.addEventListener('click', () => {
+            window.print();
+        }); // Listener baru untuk cetak
+
+    </script>
+</body>
+</html>
